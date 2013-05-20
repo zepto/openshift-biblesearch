@@ -1,0 +1,139 @@
+#!/usr/bin/env python
+
+import os, pymongo, json, bson, re
+from bottle import Bottle, request
+
+application = Bottle()
+app = application
+
+@app.route('/')
+def index():
+    return  '''
+                <p><a href="/parks">All Parks</a></p>
+                <p><a href="/parks/park">Query by Park ID</a></p>
+                <p><a href="/parks/name">Query by Park Name</a></p>
+                <p><a href="/parks/near">Query by Coordinates</a></p>
+                <p><a href="/parks/name/near">Query by Park Name & Coordinates</a></p>
+            '''
+
+@app.route('/hello')
+@app.route('/hello/<name>')
+def greet(name='Stranger'):
+    return 'Hello %s, how are you?' % name
+
+
+# mongoimport -d parks -c parkpoints --type json --file app-root/data/parkcoord.json -h $OPENSHIFT_MONGODB_DB_HOST -u admin -p $OPENSHIFT_MONGODB_DB_PASSWORD
+# db.parkpoints.ensureIndex( { pos : "2d" } );
+
+
+@app.get("/parks")
+def parks():
+    #setup the connection
+    conn = pymongo.Connection(os.environ['OPENSHIFT_MONGODB_DB_URL'])
+    db = conn.parks
+
+    #query the DB for all the parkpoints
+    result = db.parkpoints.find()
+
+    #Now turn the results into valid JSON
+    return json.dumps(str(list(result)))
+
+#return a specific park given it's mongo _id
+@app.get("/parks/park")
+def onePark_form():
+    return '''<form method="POST" action="/parks/park">
+                <input name="parkId" value="Park ID" type="text" />
+                <input type="submit" />
+              </form>'''
+
+@app.post("/parks/park")
+def onePark():
+    #setup the connection
+    conn = pymongo.Connection(os.environ['OPENSHIFT_MONGODB_DB_URL'])
+    db = conn.parks
+
+    #query based on the objectid
+    parkId = request.forms.get('parkId')
+    result = db.parkpoints.find({'_id': bson.objectid.ObjectId(parkId)})
+
+    #turn the results into valid JSON
+    return json.dumps(str(list(result)))
+
+#find parks near a lat and long passed in as query parameters
+@app.get("/parks/near")
+def near_form():
+    return '''<form method="POST" action="/parks/near">
+                <input name="lon" value="Longtitude" type="text" />
+                <input name="lat" value="Latitude" type="text" />
+                <input type="submit" />
+              </form>'''
+
+@app.post("/parks/near")
+def near():
+    #setup the connection
+    conn = pymongo.Connection(os.environ['OPENSHIFT_MONGODB_DB_URL'])
+    db = conn.parks
+
+    #get the request parameters
+    lon = float(request.forms.get('lon'))
+    lat = float(request.forms.get('lat'))
+
+    #use the request parameters in the query
+    result = db.parkpoints.find({"pos" : { "$near" : [lon,lat]}}).limit(10)
+
+    #turn the results into valid JSON
+    return json.dumps(str(list(result)))
+
+#find parks with a certain name (using regex) near a lat long pair such as above
+@app.get("/parks/name/near")
+def nameNear_form():
+    return '''<form method="POST" action="/parks/name/near">
+                <p><input name="parkname" value="Park Name" type="text" /></p>
+                <p><input name="lon" value="Longtitude" type="text" />
+                <input name="lat" value="Latitude" type="text" /></p>
+                <input type="submit" />
+              </form>'''
+
+@app.post("/parks/name/near")
+def nameNear():
+    #setup the connection
+    conn = pymongo.Connection(os.environ['OPENSHIFT_MONGODB_DB_URL'])
+    db = conn.parks
+
+    #get the request parameters
+    name = request.forms.get('parkname')
+    lon = float(request.forms.get('lon'))
+    lat = float(request.forms.get('lat'))
+
+    #compile the regex we want to search for and make it case insensitive
+    myregex = re.compile(name, re.I)
+
+    #use the request parameters in the query along with the regex
+    result = db.parkpoints.find({"Name" : myregex, "pos" : { "$near" : [lon,lat]}})
+
+    #turn the results into valid JSON
+    return json.dumps(str(list(result)))
+
+
+@app.get("/parks/name")
+def parkName_form():
+    return '''<form method="POST" action="/parks/name">
+                <input name="parkname" value="Park Name" type="text" />
+                <input type="submit" />
+              </form>'''
+
+@app.post("/parks/name")
+def parkName():
+    #setup the connection
+    conn = pymongo.Connection(os.environ['OPENSHIFT_MONGODB_DB_URL'])
+    db = conn.parks
+
+    #query based on the objectid
+    name = request.forms.get('parkname')
+
+    #compile the regex we want to search for and make it case insensitive
+    myregex = re.compile(name, re.I)
+    result = db.parkpoints.find({"Name" : myregex})
+
+    #turn the results into valid JSON
+    return json.dumps(str(list(result)))
