@@ -29,7 +29,7 @@ import re
 
 import sword_search
 from sword_search import build_highlight_regx, highlight_search_terms
-from .errors import handler as errors_handler
+import errors
 
 
 # Global variables
@@ -96,7 +96,7 @@ ref_regx = re.compile(r'''
 
 # The main bottle app.
 bible_app = Bottle()
-bible_app.error_handler = errors_handler
+bible_app.error_handler = errors.handler
 
 project_root = dirname(__file__)
 
