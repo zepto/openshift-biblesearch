@@ -792,15 +792,15 @@ def index(location='biblesearch'):
 
     """
 
-    if location == 'biblesearch':
-        if request.get_cookie('javascript'):
-            print('javascript: yep')
-            return build_search_page()
-        else:
-            print('javascript: nope')
-            return build_page()
-
     try:
+        if location == 'biblesearch':
+            if request.get_cookie('javascript'):
+                print('javascript: yep')
+                return build_search_page()
+            else:
+                print('javascript: nope')
+                return build_page()
+
         return template(location)
     except Exception as err:
         return err
