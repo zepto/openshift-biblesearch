@@ -451,11 +451,14 @@ def build_search_page(verse_list: str='', verses: str='',
         },
     ]
 
-    dropdowns = '\n'.join([template(i['name'], **i) for i in drop_list])
+    try:
+        dropdowns = '\n'.join([template(i['name'], **i) for i in drop_list])
 
-    return template('biblesearch', verse_list=verse_list, verses=verses,
-                    strongs_morph=strongs_morph, dropdowns=dropdowns,
-                    search_terms=html_escape(search_terms))
+        return template('biblesearch', verse_list=verse_list, verses=verses,
+                        strongs_morph=strongs_morph, dropdowns=dropdowns,
+                        search_terms=html_escape(search_terms))
+    except Exception as err:
+        return err
 
 
 def build_page(reference_list: list=[], search_terms: str='', context: int=0):
