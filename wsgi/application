@@ -786,6 +786,8 @@ def index(location='biblesearch'):
 
     """
 
+    return "Helllo"
+
     if location == 'biblesearch':
         if request.get_cookie('javascript'):
             print('javascript: yep')
