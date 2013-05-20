@@ -35,5 +35,5 @@ if __name__ == '__main__':
    zapp = imp.load_source('application', 'wsgi/application')
 
    print('Starting WSGIServer on %s:%d ... ' % (ip, port))
-   run_simple_httpd_server(zapp.application, ip, port)
+   run_simple_httpd_server(zapp.bible_app, ip, port)
 
