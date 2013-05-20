@@ -500,8 +500,6 @@ def handle_static(path):
 
     """
 
-    return path
-
     # Return the requested static file.
     return static_file(path, join(project_root, "assets"))
 
