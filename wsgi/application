@@ -27,8 +27,8 @@ from time import strftime
 import json
 import re
 
-import .sword_search
-from .sword_search import build_highlight_regx, highlight_search_terms
+import sword_search
+from sword_search import build_highlight_regx, highlight_search_terms
 import .errors
 
 
