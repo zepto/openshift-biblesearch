@@ -29,7 +29,7 @@ import re
 
 import sword_search
 from sword_search import build_highlight_regx, highlight_search_terms
-import errors
+# import errors
 
 
 # Global variables
@@ -96,7 +96,25 @@ ref_regx = re.compile(r'''
 
 # The main bottle app.
 bible_app = Bottle()
-bible_app.error_handler = errors.handler
+
+from bottle import redirect, error, jinja2_template as template
+
+
+def errors(error):
+    """ Handle errors.
+
+    """
+
+    return template('error', error_no=error.args[0], error=error.args[1:])
+
+handler = {
+    500: errors,
+    404: errors,
+    403: errors,
+    401: errors,
+}
+
+bible_app.error_handler = handler
 
 project_root = dirname(__file__)
 
