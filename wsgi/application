@@ -20,6 +20,7 @@
 
 from os.path import join, dirname
 from bottle import run, debug, jinja2_template as template
+from bottle import redirect, error
 from bottle import request, response, redirect, static_file, Bottle
 from bottle import TEMPLATE_PATH
 from string import printable as string_printable
@@ -102,8 +103,6 @@ TEMPLATE_PATH.insert(0, views_path)
 
 # The main bottle app.
 bible_app = Bottle()
-
-from bottle import redirect, error, jinja2_template as template
 
 
 def errors(error):
@@ -451,14 +450,11 @@ def build_search_page(verse_list: str='', verses: str='',
         },
     ]
 
-    try:
-        dropdowns = '\n'.join([template(i['name'], **i) for i in drop_list])
+    dropdowns = '\n'.join([template(i['name'], **i) for i in drop_list])
 
-        return template('biblesearch', verse_list=verse_list, verses=verses,
-                        strongs_morph=strongs_morph, dropdowns=dropdowns,
-                        search_terms=html_escape(search_terms))
-    except Exception as err:
-        return err
+    return template('biblesearch', verse_list=verse_list, verses=verses,
+                    strongs_morph=strongs_morph, dropdowns=dropdowns,
+                    search_terms=html_escape(search_terms))
 
 
 def build_page(reference_list: list=[], search_terms: str='', context: int=0):
@@ -795,18 +791,15 @@ def index(location='biblesearch'):
 
     """
 
-    try:
-        if location == 'biblesearch':
-            if request.get_cookie('javascript'):
-                print('javascript: yep')
-                return build_search_page()
-            else:
-                print('javascript: nope')
-                return build_page()
+    if location == 'biblesearch':
+        if request.get_cookie('javascript'):
+            print('javascript: yep')
+            return build_search_page()
+        else:
+            print('javascript: nope')
+            return build_page()
 
-        return template(location)
-    except Exception as err:
-        return err
+    return template(location)
 
 
 if __name__ == "__main__":
