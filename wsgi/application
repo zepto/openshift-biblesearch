@@ -791,14 +791,13 @@ def index(location='biblesearch'):
 
     """
 
-    return '\n'.join(bottle.TEMPLATE_PATH)
-    if location == 'biblesearch':
-        if request.get_cookie('javascript'):
-            print('javascript: yep')
-            return build_search_page()
-        else:
-            print('javascript: nope')
-            return build_page()
+    # if location == 'biblesearch':
+        # if request.get_cookie('javascript'):
+        #     # print('javascript: yep')
+        #     return build_search_page()
+        # else:
+        #     # print('javascript: nope')
+        #     return build_page()
 
     return template(location)
 
