@@ -791,6 +791,7 @@ def index(location='biblesearch'):
 
     """
 
+    return '\n'.join(bottle.TEMPLATE_PATH)
     if location == 'biblesearch':
         if request.get_cookie('javascript'):
             print('javascript: yep')
