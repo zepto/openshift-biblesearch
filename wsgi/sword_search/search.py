@@ -1418,7 +1418,7 @@ class Search(object):
         """
 
         # The index dictionary.
-        self._index_dict = IndexDict(module, path)
+        # self._index_dict = IndexDict(module, path)
 
         self._module_name = module
         self._multi = multiword
