@@ -32,8 +32,7 @@ import sys
 import sword_search
 from sword_search import build_highlight_regx, highlight_search_terms
 
-sys.path.insert(0, join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi/'))
-import errors
+errors = None
 
 
 # Global variables
@@ -124,7 +123,6 @@ bible_app = Bottle()
 # }
 #
 # bible_app.error_handler = handler
-bible_app.error_handler = errors.handler
 
 project_root = dirname(__file__)
 
@@ -803,10 +801,13 @@ def index(location='biblesearch'):
 
     """
 
-    # try:
-    #     import errors
-    # except Exception as err:
-    #     return "Error: {0}".format(err)
+    if not errors:
+        try:
+            sys.path.insert(0, join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi/'))
+            import errors
+            bible_app.error_handler = errors.handler
+        except Exception as err:
+            return "Error: {0}".format(err)
 
     if location == 'biblesearch':
         if request.get_cookie('javascript'):
