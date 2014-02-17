@@ -1384,33 +1384,37 @@ class CombinedParse(object):
         return return_list
 
 
+class Test(object):
+    def __init__(self):
+        pass
+
 class Search(object):
     """ Provides a simple way of searching an IndexDict for verses.
 
     """
 
     # To check for spaces.
-    # _whitespace_regx = re.compile(r'\s')
-    #
-    # # Cleanup regular expressions.
-    # _non_alnum_regx = re.compile(r'[^\w\*<>\{\}\(\)-]')
-    # _fix_regx = re.compile(r'\s+')
-    #
-    # # Match strongs numbers.
-    # _strongs_regx = re.compile(r'[<]?(\b[GH]\d+\b)[>]?', re.I)
-    # # It needs to match with braces or it will catch all capitalized
-    # # word and words with '-'s in them.
-    # _morph_regx = re.compile(r'[\(\{](\b[\w-]+\b)[\}\)]', re.I)
-    # _word_regx = re.compile(r'\b([\w\\-]+)\b')
-    # _space_regx = re.compile(r'\s+')
-    # _non_word_regx = re.compile(r'[<>\(\)]')
-    #
-    # _fix_strongs = classmethod(lambda c, m: '<%s>' % m.groups()[0].upper())
-    # _fix_morph = classmethod(lambda c, m: '{%s}' % m.groups()[0].upper())
-    #
-    # # Escape the morphological tags.
-    # _escape_morph = classmethod(lambda c, m: \
-    #         '\{%s\}' % re.escape(m.groups()[0]).upper())
+    _whitespace_regx = re.compile(r'\s')
+
+    # Cleanup regular expressions.
+    _non_alnum_regx = re.compile(r'[^\w\*<>\{\}\(\)-]')
+    _fix_regx = re.compile(r'\s+')
+
+    # Match strongs numbers.
+    _strongs_regx = re.compile(r'[<]?(\b[GH]\d+\b)[>]?', re.I)
+    # It needs to match with braces or it will catch all capitalized
+    # word and words with '-'s in them.
+    _morph_regx = re.compile(r'[\(\{](\b[\w-]+\b)[\}\)]', re.I)
+    _word_regx = re.compile(r'\b([\w\\-]+)\b')
+    _space_regx = re.compile(r'\s+')
+    _non_word_regx = re.compile(r'[<>\(\)]')
+
+    _fix_strongs = classmethod(lambda c, m: '<%s>' % m.groups()[0].upper())
+    _fix_morph = classmethod(lambda c, m: '{%s}' % m.groups()[0].upper())
+
+    # Escape the morphological tags.
+    _escape_morph = classmethod(lambda c, m: \
+            '\{%s\}' % re.escape(m.groups()[0]).upper())
 
     def __init__(self, module='KJV', path='', multiword=False):
         """ Initialize the search.
@@ -1418,1203 +1422,1203 @@ class Search(object):
         """
 
         # The index dictionary.
-        # self._index_dict = IndexDict(module, path)
+        self._index_dict = IndexDict(module, path)
 
         self._module_name = module
         self._multi = multiword
 
-    # @classmethod
-    # def search_terms_to_regex(cls, search_terms, case_sensitive,
-    #                           word_bound='\\\\b', extra_space='',
-    #                           sloppy=False, is_regex=False):
-    #     """ Build a regular expression from the search_terms to match a verse
-    #     in the Bible.
-    #
-    #     """
-    #
-    #     # Set the flags for the regular expression.
-    #     flags = re.I if not case_sensitive else 0
-    #
-    #     if is_regex:
-    #         reg_str = search_terms
-    #         info_print('\nUsing regular expression: %s\n' % reg_str, tag=2)
-    #
-    #         try:
-    #             return re.compile(reg_str, flags)
-    #         except Exception as err:
-    #             print("An error occured while compiling the highlight "
-    #                   "regular expression %s: %s." % (reg_str, err),
-    #                   " There will be no highlighting.\n", file=sys.stderr)
-    #             return re.compile(r'')
-    #
-    #     # This will skip words.
-    #     not_words_str = r'\b\w+\b'
-    #     # This will skip Strong's Numbers.
-    #     not_strongs_str = r'<[^>]*>'
-    #     # This wil skip Morphological Tags.
-    #     not_morph_str = r'\{[^\}]*\}'
-    #     # This will skip all punctuation.  Skipping ()'s is a problem for
-    #     # searching Morphological Tags, but it is necessary for the
-    #     # parenthesized words.  May break highlighting.
-    #     not_punct_str = r'[\s,\?\!\.;:\\/_\(\)\[\]"\'-]'
-    #     # This will skip ansi color.
-    #     not_color_str = r'\033\[[\d;]*m'
-    #     # Match all *'s
-    #     star_regx = re.compile(r'\*')
-    #
-    #     # Hold the string that fills space between search terms.
-    #     space_str = ''
-    #
-    #     # Get stars past so we can replace them with '\w*' later.
-    #     temp_str, word_count = star_regx.subn(r'_star_', search_terms)
-    #
-    #     # Hack to get rid of unwanted characters.
-    #     temp_str = cls._non_alnum_regx.sub(' ', temp_str).split()
-    #     temp_str = ' '.join(temp_str)
-    #     # Phrases will have spaces in them
-    #     phrase = bool(cls._whitespace_regx.search(temp_str))
-    #     # Escape the morphological tags, and also find how many there are.
-    #     temp_str, morph_count = cls._morph_regx.subn(cls._escape_morph,
-    #                                                      temp_str)
-    #     # Make all Strong's Numbers uppercase, also find how many there are.
-    #     temp_str, strongs_count = cls._strongs_regx.subn(cls._fix_strongs,
-    #                                                      temp_str)
-    #     # Select all words.
-    #     #repl = '(\\\\b\\1\\\\b)'
-    #     # This works:
-    #     # temp_str, word_count = \
-    #     #       cls._word_regx.subn('{0}(\\1){0}'.format(word_bound), temp_str)
-    #     repl = '({0}(\\1){0})'.format(word_bound)
-    #     temp_str, word_count = cls._word_regx.subn(repl, temp_str)
-    #     # Replace what used to be *'s with '\w*'.
-    #     temp_str = temp_str.replace('_star_', '\w*')
-    #
-    #     # All the Strong's and Morphology were changed in the previous
-    #     # substitution, so if that number is greater than the number of
-    #     # Strong's plus Morphology then there were words in the search terms.
-    #     # I do this because I don't know how to only find words.
-    #     words_found = (strongs_count + morph_count) < word_count
-    #     if phrase:
-    #         # Build the string that is inserted between the items in the
-    #         # search string.
-    #         space_str = r'(?:%s%s' % (not_punct_str, extra_space)
-    #         if not bool(strongs_count) or sloppy:
-    #             # Skip over all Strong's Numbers.
-    #             space_str = r'%s|%s' % (space_str, not_strongs_str)
-    #         if not bool(morph_count) or sloppy:
-    #             # Skip all Morphological Tags.
-    #             space_str = r'%s|%s' % (space_str, not_morph_str)
-    #         if not words_found or bool(morph_count) or bool(strongs_count) or \
-    #                 sloppy:
-    #             # Skip words.  If word attributes are in the search we can
-    #             # skip over words and still keep it a phrase.
-    #             space_str = r'%s|%s' % (space_str, not_words_str)
-    #         # Finally make it not greedy.
-    #         space_str = r'%s)*?' % space_str
-    #     else:
-    #         space_str = ''
-    #     # Re-combine the search terms with the regular expression string
-    #     # between each element.
-    #     reg_str = space_str.join(temp_str.split())
-    #     info_print('\nUsing regular expression: %s\n' % reg_str, tag=2)
-    #
-    #     try:
-    #         return re.compile(reg_str, flags)
-    #     except Exception as err:
-    #         print("An error occured while compiling the highlight "
-    #               "regular expression %s: %s." % (reg_str, err),
-    #               " There will be no highlighting.\n", file=sys.stderr)
-    #
-    #         return re.compile(r'')
-    #
-    # def _sorted_iter(self, verse_ref_set):
-    #     """ Returns an iterator over a sorted version of verse_ref_set.
-    #
-    #     """
-    #
-    #     # Speed up the iteration by first sorting the range.
-    #     return iter(sorted(verse_ref_set, key=sort_key))
-    #
-    # def _clean_text(self, text):
-    #     """ Return a clean (only alphanumeric) text of the provided string.
-    #
-    #     """
-    #
-    #     # Do we have to use two regular expressions to do this.
-    #     # Replace all non-alphanumeric characters with a space.
-    #     temp_text = self._non_alnum_regx.sub(' ', text)
-    #     # Replace one or more spaces with one space.
-    #     clean_text = self._fix_regx.sub(' ', temp_text)
-    #
-    #     return clean_text.strip()
-    #
-    # def _fix_strongs_morph(self, search_terms):
-    #     """ Make any Strong's or Morphology uppercase, put parenthesis around
-    #     the Morphological Tags, and put <>'s around the Strong's Numbers.
-    #
-    #     """
-    #
-    #     # Capitalize all strongs numbers and remove the <> from them.
-    #     temp_str = self._strongs_regx.sub(self._fix_strongs, search_terms)
-    #     # Capitalize all morphological tags and make sure they are in
-    #     # parenthesis.
-    #     temp_str = self._morph_regx.sub(self._fix_morph, temp_str)
-    #
-    #     return temp_str
-    #
-    # def _process_search(func):
-    #     """ Returns a wrapper function that processes the search terms, calls
-    #     the wrapped function, and, if applicable, confines the resulting verse
-    #     set to a range.
-    #
-    #     """
-    #
-    #     @wraps(func)
-    #     def wrapper(self, search_terms, strongs=False, morph=False,
-    #                 added=True, case_sensitive=False, range_str=''):
-    #         """ Process the search terms according to the wrapped functions
-    #         requirements, then apply the range, if given, to the returned set
-    #         of verses.
-    #
-    #         """
-    #
-    #         if func.__name__ in ['sword_search']:
-    #             if not Sword:
-    #                 print("Sword library not found.")
-    #                 return
-    #
-    #         if not isinstance(search_terms, str):
-    #             # Combine the terms for use by the different methods.
-    #             search_terms = ' '.join(search_terms)
-    #
-    #         # Get a valid set of verse references that conform to the passed
-    #         # range.
-    #         range_set = parse_verse_range(range_str)
-    #
-    #         if func.__name__ not in ['regex_search', 'partial_word_search']:
-    #             # Try to catch and fix any Strong's Numbers or Morphological
-    #             # Tags.
-    #             search_terms = self._fix_strongs_morph(search_terms)
-    #
-    #         # Regular expression and combined searches get the search terms as
-    #         # they were passed.
-    #         if func.__name__ in ['multiword_search', 'anyword_search',
-    #                              'phrase_search', 'mixed_phrase_search']:
-    #             # Get rid of any non-alphanumeric or '-' characters from
-    #             # the search string.
-    #             search_str = self._clean_text(search_terms).strip()
-    #             if strongs or morph:
-    #                 # Strong's numbers and Morphological tags are all
-    #                 # uppercase.  This is only required if the Morphological
-    #                 # Tags were not surrounded by parenthesis.
-    #                 search_str = search_str.upper().strip()
-    #         else:
-    #             search_str = search_terms
-    #
-    #         # Get the set of found verses.
-    #         found_set = func(self, search_str, strongs, morph, added,
-    #                          case_sensitive, range_set)
-    #
-    #         # The phrase, regular expression, and combined searches apply the
-    #         # range before searching, so only multi-word and any-word searches
-    #         # have it applied here.
-    #         if func.__name__ in ['multiword_search', 'anyword_search',
-    #                              'partial_word_search']:
-    #             if range_set:
-    #                 found_set.intersection_update(range_set)
-    #         return found_set
-    #
-    #     # Return wrapper function.
-    #     return wrapper
-    #
-    # @_process_search
-    # def combined_search(self, search_terms, strongs=False, morph=False,
-    #                     added=True, case_sensitive=False, range_str=''):
-    #     """ combined_search(self, search_terms, strongs=False, morph=False,
-    #                     case_sensitive=False, range_str=''): ->
-    #     Perform a combined search.  Search terms could be
-    #     'created NOT (and OR but)' and it would find all verses with the word
-    #     'created' in them and remove any verse that had either 'and' or 'but.'
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     info_print("Searching for '%s'..." % search_terms, tag=1)
-    #
-    #     # Process the search_terms.
-    #     arg_parser = CombinedParse(search_terms)
-    #     # Get the list of words and/or phrases to include.
-    #     word_list = arg_parser.word_list
-    #     # Get the list of words and/or phrases to NOT include.
-    #     not_list = arg_parser.not_list
-    #
-    #     phrase_search = self.phrase_search
-    #     multiword_search = self.multiword_search
-    #
-    #     def combine_proc(str_list):
-    #         """ Performs combined search on the strings in str_list, and
-    #         returns a set of references that match.
-    #
-    #         """
-    #
-    #         and_it = False
-    #         temp_set = set()
-    #         for word in str_list:
-    #             # A '+' before or after a word means it should have a phrase
-    #             # search done on it and the words with it.
-    #             if '+' in word:
-    #                 # Do a phrase search on the word string.
-    #                 result_set = phrase_search(word.replace('+', ' '), strongs,
-    #                                            morph, case_sensitive,
-    #                                            range_str)
-    #             elif word == '&':
-    #                 # Combine the next search results with this one.
-    #                 and_it = True
-    #                 continue
-    #             else:
-    #                 # Do a multi-word search on the word string.
-    #                 result_set = multiword_search(word, strongs, morph,
-    #                                               case_sensitive, range_str)
-    #             if and_it:
-    #                 # The previous word said to find verses that match both.
-    #                 temp_set.intersection_update(result_set)
-    #                 and_it = False
-    #             else:
-    #                 # Only keep the verses that have either one group or the
-    #                 # other but not both.
-    #                 temp_set.symmetric_difference_update(result_set)
-    #
-    #         return temp_set
-    #
-    #     # Remove any verses that have the NOT words in them.
-    #     found_set = combine_proc(word_list).difference(combine_proc(not_list))
-    #
-    #     return found_set
-    #
-    # @_process_search
-    # def combined_phrase_search(self, search_terms, strongs=False, morph=False,
-    #                            added=True, case_sensitive=False, range_str=''):
-    #     """ combined_phrase_search(self, search_terms, strongs=False,
-    #             morph=False, case_sensitive=False, range_str=''): ->
-    #     Perform a combined phrase search.  Search terms could be
-    #     'created NOT (and AND but)' and it would find all verses with the word
-    #     'created' in them and remove any verse that had the phrase 'and but.'
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     info_print("Searching for '%s'..." % search_terms, tag=1)
-    #
-    #     # Process the search_terms.
-    #     arg_parser = CombinedParse(search_terms)
-    #     # Get the list of words and/or phrases to include.
-    #     word_list = arg_parser.word_list
-    #     # Get the list of words and/or phrases to NOT include.
-    #     not_list = arg_parser.not_list
-    #
-    #     phrase_search = self.phrase_search
-    #
-    #     def combine_proc(str_list):
-    #         """ Performs combined phrase search on the strings in str_list, and
-    #         returns a set of references that match.
-    #
-    #         """
-    #
-    #         temp_set = set()
-    #         for word in str_list:
-    #             # Do a phrase search on the word string.
-    #             result_set = phrase_search(word.replace('+', ' '), strongs,
-    #                                        morph, case_sensitive,
-    #                                        range_str)
-    #             # Include all the verses that have any of the word groups.
-    #             temp_set.update(result_set)
-    #
-    #         return temp_set
-    #
-    #     # Remove any verses that have the NOT words in them.
-    #     found_set = combine_proc(word_list).difference(combine_proc(not_list))
-    #
-    #     return found_set
-    #
-    # @_process_search
-    # def multiword_search(self, search_terms, strongs=False, morph=False,
-    #                      added=True, case_sensitive=False, range_str=''):
-    #     """ multiword_search(self, search_terms, strongs=False, morph=False,
-    #               case_sensitive=False, range_str='') ->
-    #     Perform a multiword search using the search_terms.
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     info_print("Searching for verses with all these words "
-    #                "'%s'..." % ', '.join(search_terms.split()), tag=1)
-    #
-    #     # All that needs to be done is find all references with all the
-    #     # searched words in them.
-    #     found_set = self._index_dict.value_intersect(search_terms.split(),
-    #                                                  case_sensitive)
-    #
-    #     return found_set
-    #
-    # @_process_search
-    # def eitheror_search(self, search_terms, strongs=False, morph=False,
-    #                     added=True, case_sensitive=False, range_str=''):
-    #     """ eitheror_search(self, search_terms, strongs=False, morph=False,
-    #             case_sensitive=False, range_str='') ->
-    #     Perform a search returning any verse with one and only one of the terms
-    #     searched for.
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     info_print("Searching for verses with one and not all of these words "
-    #                "'%s'..." % ', '.join(search_terms.split()), tag=1)
-    #
-    #     # Any verse with one and only one of the searched words.
-    #     found_set = self._index_dict.value_sym_diff(search_terms.split(),
-    #                                                 case_sensitive)
-    #
-    #     return found_set
-    #
-    # @_process_search
-    # def anyword_search(self, search_terms, strongs=False, morph=False,
-    #                    added=True, case_sensitive=False, range_str=''):
-    #     """ anyword_search(self, search_terms, strongs=False, morph=False,
-    #             case_sensitive=False, range_str='') ->
-    #     Perform a search returning any verse with one or more of the search
-    #     terms.
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     info_print("Searching for verses with any of these words "
-    #                "'%s'..." % ', '.join(search_terms.split()), tag=1)
-    #
-    #     # Any verse with one or more of the searched words.
-    #     found_set = self._index_dict.value_union(search_terms.split(),
-    #                                              case_sensitive)
-    #
-    #     return found_set
-    #
-    # @_process_search
-    # def partial_word_search(self, search_terms, strongs=False, morph=False,
-    #                        added=True, case_sensitive=False, range_str=''):
-    #     """ partial_word_search(self, search_terms, strongs=False, morph=False,
-    #             case_sensitive=False, range_str='') ->
-    #     Perform a search returning any verse with one or more words matching
-    #     the partial words given in the search terms.  Partial words are markes
-    #     tih *'s (e.g. '*guil*' will match any word with 'guil' in it such as
-    #     'guilt' or 'beguile.'
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     info_print("Searching for verses with any of these partial words "
-    #                "'%s'..." % ', '.join(search_terms.split()), tag=1)
-    #
-    #     #found_set = self._index_dict.value_union(
-    #             #self._words_from_partial(search_terms, case_sensitive),
-    #             #case_sensitive)
-    #     search_list = search_terms.split()
-    #     found_set = self._index_dict.from_partial(search_list, case_sensitive)
-    #
-    #     return found_set
-    #
-    # def _words_from_partial(self, partial_word_list, case_sensitive=False):
-    #     """ Search through a list of partial words and yield words that match.
-    #
-    #     """
-    #
-    #     flags = re.I if not case_sensitive else 0
-    #
-    #     # Split the search terms and search through each word key in the index
-    #     # for any word that contains the partial word.
-    #     word_list = partial_word_list.split()
-    #     for word in self._index_dict['_words_']:
-    #         for partial_word in word_list:
-    #             # A Regular expression that matches any number of word
-    #             # characters for every '*' in the term.
-    #             reg_str = '\\b%s\\b' % partial_word.replace('*', '\w*')
-    #             try:
-    #                 word_regx = re.compile(reg_str, flags)
-    #             except Exception as err:
-    #                 print('There is a problem with the regular expression '
-    #                       '%s: %s' % (reg_str, err), file=sys.stderr)
-    #                 exit()
-    #             if word_regx.match(word):
-    #                 yield word
-    #
-    # def _process_phrase(func):
-    #     """ Returns a wrapper function for wrapping phrase like searches.
-    #
-    #     """
-    #
-    #     @wraps(func)
-    #     def wrapper(self, search_terms, strongs=False, morph=False,
-    #                 added=True, case_sensitive=False, range_str=''):
-    #         """ Gets a regular expression from the wrapped function, then
-    #         builds a set of verse references to search, finally it calls the
-    #         searching function with the regular expression and the verse
-    #         reference iterator, and returns the resulting set of references.
-    #
-    #         """
-    #
-    #         search_regx = func(self, search_terms, strongs, morph, added,
-    #                            case_sensitive, range_str)
-    #
-    #         # First make sure we are only searching verses that have all the
-    #         # search terms in them.
-    #         search_list = search_terms.split()
-    #         if '*' in search_terms:
-    #             ref_set = self._index_dict.from_partial(search_list,
-    #                                                     case_sensitive,
-    #                                                     common_limit=5000)
-    #         else:
-    #             ref_set = self._index_dict.value_intersect(search_list,
-    #                                                        case_sensitive)
-    #         if range_str:
-    #             # Only search through the supplied range.
-    #             ref_set.intersection_update(range_str)
-    #
-    #         # No need to search for a single word phrase.
-    #         if len(search_terms.split()) == 1:
-    #             return ref_set
-    #
-    #         # Sort the list so it may be a little faster.  Only needed if we're
-    #         # using the sword module to look them up.
-    #         ref_iter = self._sorted_iter(ref_set)
-    #
-    #         # Disable Strong's and Morphological if only words are used.
-    #         strongs = bool(self._strongs_regx.search(search_terms))
-    #         morph = bool(self._morph_regx.search(search_terms))
-    #
-    #         return self.find_from_regex(ref_iter, search_regx, strongs, morph)
-    #
-    #     return wrapper
-    #
-    # @_process_search
-    # @_process_phrase
-    # def ordered_multiword_search(self, search_terms, strongs=False,
-    #                              morph=False, added=True, case_sensitive=False,
-    #                              range_str=''):
-    #     """ ordered_multiword_search(self, search_terms, strongs=False,
-    #         morph=False, case_sensitive=False, range_str='') ->
-    #     Perform an ordered multiword search.  Like a multiword search, but all
-    #     the words have to be in order.
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     info_print("Searching for verses with these words in order "
-    #                "'%s'..." % search_terms, tag=1)
-    #
-    #     return self.search_terms_to_regex(search_terms, case_sensitive,
-    #                                       sloppy=True)
-    #
-    # @_process_search
-    # @_process_phrase
-    # def phrase_search(self, search_terms, strongs=False, morph=False,
-    #                   added=True, case_sensitive=False, range_str=''):
-    #     """ phrase_search(self, search_terms, strongs=False, morph=False,
-    #            case_sensitive=False, range_str='') ->
-    #     Perform a phrase search.
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     info_print("Searching for verses with this phrase "
-    #                "'%s'..." % search_terms, tag=1)
-    #
-    #     # Make all the terms the same case if case doesn't matter.
-    #     flags = re.I if not case_sensitive else 0
-    #
-    #     if strongs:
-    #         # Match strongs phrases.
-    #         search_reg_str = search_terms.replace(' ', r'[^<]*')
-    #     elif morph:
-    #         # Match morphological phrases.
-    #         search_reg_str = search_terms.replace(' ', r'[^\{]*')
-    #     else:
-    #         # Match word phrases
-    #         search_reg_str = '\\b%s\\b' % search_terms.replace(' ',
-    #                 r'\b(<[^>]*>|\{[^\}]*\}|\W)*\b')
-    #
-    #     # Make a regular expression from the search terms.
-    #     return re.compile(search_reg_str, flags)
-    #
-    # @_process_search
-    # @_process_phrase
-    # def mixed_phrase_search(self, search_terms, strongs=False, morph=False,
-    #                         added=True, case_sensitive=False, range_str=''):
-    #     """ mixed_phrase_search(self, search_terms, strongs=False, morph=False,
-    #     case_sensitive=False, range_str='') ->
-    #     Perform a phrase search.
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     info_print("Searching for verses with this phrase "
-    #                "'%s'..." % search_terms, tag=1)
-    #
-    #     # Make a regular expression from the search terms.
-    #     return self.search_terms_to_regex(search_terms, case_sensitive)
-    #
-    # @_process_search
-    # def regex_search(self, search_terms, strongs=False, morph=False,
-    #                  added=True, case_sensitive=False, range_str=''):
-    #     """ regex_search(self, search_terms, strongs=False, morph=False,
-    #           case_sensitive=False, range_str='') ->
-    #     Perform a regular expression search.
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     info_print("Searching for regular expression '%s'..." % search_terms,
-    #                tag=1)
-    #
-    #     # re.I is case insensitive.
-    #     flags = re.I if not case_sensitive else 0
-    #
-    #     try:
-    #         # Make a regular expression from the search_terms.
-    #         search_regx = re.compile(r'%s' % search_terms, flags)
-    #     except Exception as err:
-    #         print('There is a problem with the regular expression "%s": %s' % \
-    #                 (search_terms, err), file=sys.stderr)
-    #         exit()
-    #
-    #     if range_str:
-    #         # Only search through the supplied range.
-    #         ref_iter = self._sorted_iter(range_str)
-    #     else:
-    #         # Search the entire Bible.
-    #         ref_iter = VerseIter('Genesis 1:1')
-    #
-    #     return self.find_from_regex(ref_iter, search_regx, strongs, morph,
-    #                                 tag=1, try_clean=True)
-    #
-    # def find_from_regex(self, ref_iter, search_regex, strongs=False,
-    #                     morph=False, added=True, tag=3, try_clean=False):
-    #     """ Iterates through all the verses in the ref iter iterator and
-    #     returns a list of verses whose text matches search_regx.
-    #
-    #     """
-    #
-    #     # Get an iterator that will return tuples
-    #     # (verse_reference, verse_text).
-    #     verse_iter = IndexedVerseTextIter(ref_iter, strongs=strongs,
-    #                                       morph=morph, added=added,
-    #                                       module=self._module_name)
-    #
-    #     found_set = set()
-    #     for verse_ref, verse_text in verse_iter:
-    #         info_print('\033[%dD\033[KSearching...%s' % \
-    #                    (len(verse_ref) + 20, verse_ref), end='', tag=tag)
-    #
-    #         # Search for matches in the verse text.
-    #         if search_regex.search(verse_text):
-    #             found_set.add(verse_ref)
-    #         elif try_clean and not strongs and not morph:
-    #             # Should we do this or should we trust the user knows what
-    #             # puctuation are in the verses?
-    #             clean_verse_text = self._clean_text(verse_text)
-    #             if search_regex.search(clean_verse_text):
-    #                 found_set.add(verse_ref)
-    #
-    #     info_print("...Done.", tag=tag)
-    #
-    #     return found_set
-    #
-    # def mixed_search(self, search_terms, strongs=False, morph=False,
-    #                  added=True, case_sensitive=False, range_str=''):
-    #     """ mixed_search(self, search_terms, strongs=False, morph=False,
-    #            case_sensitive=False, range_str='') ->
-    #     Perform a mixed search.
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         added           -   Search in the added text (i.e. italics).
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #
-    #     """
-    #
-    #     found_set = set()
-    #     not_set = set()
-    #     and_set = set()
-    #     or_set = set()
-    #     xor_set = set()
-    #
-    #     combine_dict = {
-    #             '!': not_set.update,
-    #             '+': and_set.intersection_update,
-    #             '|': or_set.update,
-    #             '^': xor_set.symmetric_difference_update,
-    #             }
-    #
-    #     for term in search_terms:
-    #         if term[0] in '!+^|':
-    #             # Set the correct combining function, and cleanup the item.
-    #             if term[0] == '+' and not and_set:
-    #                 # All of these verses go in the output.
-    #                 combine_func = and_set.update
-    #             else:
-    #                 combine_func = combine_dict[term[0]]
-    #             term = term[1:]
-    #         else:
-    #             if self._multi and found_set:
-    #                 # If multiword is default and found_set is not empty
-    #                 # make all search terms appear in the output.
-    #                 combine_func = found_set.intersection_update
-    #             else:
-    #                 # Any of these verses could be in the output
-    #                 combine_func = found_set.update
-    #
-    #         if term.startswith('&'):
-    #             # Allow regular expression searching.
-    #             term = term[1:]
-    #             search_func = self.regex_search
-    #         elif ' ' in term:
-    #             # Search term is a quoted string, so treat it like a phrase.
-    #             if term.startswith('~'):
-    #                 # ~'s trigger ordered multiword or sloppy phrase search.
-    #                 term = term[1:]
-    #                 search_func = self.ordered_multiword_search
-    #             else:
-    #                 search_func = self.mixed_phrase_search
-    #         elif '*' in term:
-    #             # Search for partial words.
-    #             search_func = self.partial_word_search
-    #         else:
-    #             # A single word should be (multi/any)-word.
-    #             search_func = self.multiword_search
-    #
-    #         # Perform a strongs search.
-    #         strongs = bool(self._strongs_regx.match(term.upper()))
-    #         # Perform a morpholagical search.
-    #         morph = bool(self._morph_regx.match(term.upper()))
-    #
-    #         # Search for words or phrases.
-    #         temp_set = search_func(term, strongs, morph, added, case_sensitive,
-    #                                range_str)
-    #
-    #         # Add the results to the correct set.
-    #         combine_func(temp_set)
-    #
-    #     # Update the result set.
-    #     found_set.update(or_set)
-    #     found_set.update(xor_set)
-    #
-    #     if and_set and found_set:
-    #         # Make sure all the verses that are in the output have the words
-    #         # or phrases that hade a '+' in front of them.
-    #         found_set = and_set.union(found_set.intersection(and_set))
-    #     elif and_set:
-    #         # Found set must be empty to fill it with and_set's contents.
-    #         found_set.update(and_set)
-    #
-    #     # Finally remove all the verses that are in the not_set.
-    #     found_set.difference_update(not_set)
-    #
-    #     return found_set
-    #
-    # def sword_search(self, search_terms, strongs=False, morph=False,
-    #                  added=True, case_sensitive=False, range_str='',
-    #                  search_type='lucene'):
-    #     """ sword_search(self, search_terms, strongs=False, morph=False,
-    #             case_sensitive=False, range_str='', search_type=-4) ->
-    #     Use the sword module to search for the terms.
-    #
-    #         search_terms    -   Terms to search for.
-    #         strongs         -   Search for Strong's Number phrases.
-    #         morph           -   Search for Morphological Tag phrases.
-    #         case_sensitive  -   Perform a case sensitive search.
-    #         range_str       -   A verse range to limit the search to.
-    #         search_type     -   What search type to use.
-    #
-    #     """
-    #
-    #     search_terms = ' '.join(search_terms)
-    #
-    #     info_print("Searching using the Sword library for "
-    #                "'%s'..." % search_terms, tag=1)
-    #
-    #     found_set = set()
-    #
-    #     search_type_dict = {
-    #             'regex': 0,
-    #             'phrase': -1,
-    #             'multiword': -2,
-    #             'entryattrib': -3,   # (e.g. Word//Lemma//G1234)
-    #             'lucene': -4
-    #             }
-    #
-    #     try:
-    #         # Render the text as plain.
-    #         markup = Sword.MarkupFilterMgr(Sword.FMT_PLAIN)
-    #         # Don't own this or it will crash.
-    #         markup.thisown = False
-    #         mgr = Sword.SWMgr(markup)
-    #         # Load the module.
-    #         module = mgr.getModule(self._module_name)
-    #
-    #         # Set the search type based on the search_type argument.
-    #         search_type = search_type_dict.get(search_type.lower(), -4)
-    #
-    #         # Make sure we can search like this.
-    #         if not module.isSearchSupported(search_terms, search_type):
-    #             print("Search not supported", file=sys.stderr)
-    #             return found_set()
-    #
-    #         # Get the range key.
-    #         if not range_str:
-    #             range_str = 'Genesis-Revelation'
-    #         range_k = Sword.VerseKey().parseVerseList(range_str, 'Genesis 1:1',
-    #                                                   True)
-    #
-    #         flags = re.I if not case_sensitive else 0
-    #
-    #         if strongs:
-    #             # Search for strongs numbers.
-    #             # I don't know how to search for morphological tags using
-    #             # Swords search function.
-    #             prefix = 'lemma:'
-    #             for term in ','.join(search_terms.split()).split(','):
-    #                 if not term.startswith('lemma:'):
-    #                     # Make the term start with lemma: so sword will find
-    #                     # it.
-    #                     term = '%s%s' % (prefix, term)
-    #                 # Perform the search.
-    #                 resource = module.doSearch(term, search_type, flags,
-    #                                            range_k)
-    #                 # Get the list of references from the range text.
-    #                 found_set.update(resource.getRangeText().split('; '))
-    #         else:
-    #             # Perform the search.
-    #             resource = module.doSearch(search_terms, search_type, flags,
-    #                                        range_k)
-    #             # Get the list of references from the range text.
-    #             found_set.update(resource.getRangeText().strip().split('; '))
-    #     except Exception as err:
-    #         print("There was a problem while searching: %s" % err,
-    #               file=sys.stderr)
-    #
-    #     found_set.discard('')
-    #
-    #     return found_set
-    #
-    # @_process_search
-    # def test_search(self, search_terms, strongs=False, morph=False,
-    #                 added=True, case_sensitive=False, range_str=''):
-    #     """ A Test.
-    #
-    #     """
-    #
-    #     ref_set = self._index_dict.value_union(search_terms.split(),
-    #                                              case_sensitive)
-    #     if range_str:
-    #         # Only search through the supplied range.
-    #         ref_set.intersection_update(range_str)
-    #
-    #     ref_list = sorted(ref_set, key=sort_key)
-    #
-    #     term_dict = defaultdict(list)
-    #     raw_dict = RawDict(iter(ref_list), self._module_name)
-    #     words_len = 0
-    #     for verse_ref, (verse_text, verse_dict) in raw_dict:
-    #         for term in search_terms.split():
-    #             if self._strongs_regx.match(term):
-    #                 num = self._strongs_regx.sub('\\1', term)
-    #                 words = set(verse_dict[num.upper()])
-    #                 if words:
-    #                     term_dict[num.upper()].append({verse_ref: words})
-    #             elif self._morph_regx.match(term):
-    #                 tag = self._morph_regx.sub('\\1', term)
-    #                 words = set(verse_dict[tag.upper()])
-    #                 if words:
-    #                     term_dict[tag.upper()].append({verse_ref: words})
-    #             else:
-    #                 for key, value in verse_dict['_words'][0].items():
-    #                     if ' %s ' % term.lower() in ' %s ' % key.lower():
-    #                         attr_dict = value[0]
-    #                         if strongs and 'strongs' in attr_dict:
-    #                             attr_list = attr_dict['strongs']
-    #                             attr_list.append(key)
-    #                             term_dict[term].append({verse_ref: attr_list})
-    #                         if morph and 'morph' in attr_dict:
-    #                             attr_list = attr_dict['morph']
-    #                             attr_list.append(key)
-    #                             words_len = max(len(attr_list), words_len)
-    #                             term_dict[term].append({verse_ref: attr_list})
-    #     len_longest_ref = len(max(ref_set, key=len))
-    #     for key, value in term_dict.items():
-    #         words_len = max([len(i) for d in value for i, v in d.items()])
-    #         print('%s:' % key)
-    #         for dic in value:
-    #             ref, words = tuple(dic.items())[0]
-    #             if isinstance(words, list):
-    #                 w_str = '"%s"' % '", "'.join(words[:-1])
-    #                 l_str = '"%s"' % words[-1]
-    #                 words_str = '{0:{2}}: {1}'.format(w_str, l_str, words_len)
-    #             else:
-    #                 words_str = '"%s"' % '", "'.join(words)
-    #             print('\t{0:{1}}: {2}'.format(ref, len_longest_ref, words_str))
-    #                 #print('\t{0:{1}}: "{2}"'.format(ref, len_longest_ref,
-    #                 #                                 '", "'.join(words)))
-    #     exit()
-    #
-    # @_process_search
-    # def test2_search(self, search_terms, strongs=False, morph=False,
-    #                  added=True, case_sensitive=False, range_str=''):
-    #     """ A Test.
-    #
-    #     """
-    #
-    #     ref_set = self._index_dict.value_union(search_terms.split(),
-    #                                            case_sensitive)
-    #     if range_str:
-    #         # Only search through the supplied range.
-    #         ref_set.intersection_update(range_str)
-    #
-    #     ref_iter = iter(sorted(ref_set, key=sort_key))
-    #     # Get an iterator that will return tuples
-    #     # (verse_reference, verse_text).
-    #     verse_iter = IndexedVerseTextIter(ref_iter, strongs=True,
-    #                                       morph=morph, added=added,
-    #                                       module=self._module_name)
-    #
-    #     # This will skip words.
-    #     not_words_str = r'\b\w+\b'
-    #     # This will skip Strong's Numbers.
-    #     not_strongs_str = r'<[^>]*>'
-    #     # This wil skip Morphological Tags.
-    #     not_morph_str = r'\{[^\}]*\}'
-    #     # This will skip all punctuation.  Skipping ()'s is a problem for
-    #     # searching Morphological Tags, but it is necessary for the
-    #     # parenthesized words.  May break highlighting.
-    #     not_punct_str = r'[\s,\?\!\.;:\\/_\(\)\[\]"\'-]'
-    #     max_ref_len = len(max(ref_set, key=len))
-    #     found_set = set()
-    #     term_dict = defaultdict(list)
-    #     for verse_ref, verse_text in verse_iter:
-    #         for term in search_terms.split():
-    #             if self._strongs_regx.match(term):
-    #                 test_regx = re.compile(r'''
-    #                         \s
-    #                         ((?:\b\w+\b|[\s,\?\!\.;:\\/_\(\)\[\]"\'-])+)
-    #                         \s
-    #                         ((?:%s)+)
-    #                         ''' % term, re.I | re.X)
-    #             elif self._morph_regx.match(term):
-    #                 test_regx = re.compile(r'''
-    #                         \s((?:\b\w+\b|[\s,\?\!\.;:\\/_\(\)\[\]"\'-])+)
-    #                         (?:<[^>]*>|\s)+
-    #                         ((?:%s)+)
-    #                         ''' % term, re.I | re.X)
-    #             else:
-    #                 test_regx = re.compile(r'''
-    #                         ((?:\b\w+\b|[\s,\?\!\.;:\\/_\(\)\[\]"\'-])*?
-    #                         %s
-    #                         (?:\b\w+\b|[\s,\?\!\.;:\\/_\(\)\[\]"\'-])+)+
-    #                         ((?:<[^>]*>|\{[^\}]*\}|\s)+)
-    #                         ''' % term, re.I | re.X)
-    #             for match in test_regx.finditer(verse_text):
-    #                 phrase, num = match.groups()
-    #                 phrase = phrase.strip(',').strip('.').strip()
-    #                 phrase = phrase.strip(';').strip('?').strip(':').strip()
-    #                 num = num.replace('<', '').replace('>', '')
-    #                 num = num.replace('{', '').replace('}', '')
-    #                 if not phrase or not num.strip():
-    #                     if not strongs:
-    #                         break
-    #                     print(verse_ref, verse_text)
-    #                     print(match.group(), match.groups())
-    #                     exit()
-    #                 num = '"%s"' % '", "'.join(num.split())
-    #                 term_dict[term].append(
-    #                         '\t{0:{1}}: {2:{4}}: "{3}"'.format(verse_ref,
-    #                                                            max_ref_len,
-    #                                                            num, phrase,
-    #                                                            18)
-    #                                       )
-    #     for term, lst in term_dict.items():
-    #         term = term.replace('<', '').replace('>', '')
-    #         term = term.replace('{', '').replace('}', '')
-    #         print('%s:\n%s' % (term, '\n'.join(lst)))
-    #     exit()
-    #
-    # @_process_search
-    # def test3_search(self, search_terms, strongs=False, morph=False,
-    #                  added=True, case_sensitive=False, range_str=''):
-    #     """ A Test.
-    #
-    #     """
-    #
-    #     ref_set = self._index_dict.value_union(search_terms.split(),
-    #                                            case_sensitive)
-    #     if range_str:
-    #         # Only search through the supplied range.
-    #         ref_set.intersection_update(range_str)
-    #
-    #     if not ref_set:
-    #         exit()
-    #
-    #     ref_iter = iter(sorted(ref_set, key=sort_key))
-    #     # Get an iterator that will return tuples
-    #     # (verse_reference, verse_text).
-    #     verse_iter = VerseTextIter(ref_iter, strongs=strongs,
-    #                                morph=morph, render='raw',
-    #                                module=self._module_name)
-    #
-    #     found_set = set()
-    #     strong_regx = re.compile(r'strong:([GH]\d+)', re.I)
-    #     morph_regx = re.compile(r'(?:Morph|robinson):([\w-]*)', re.I)
-    #     tag_regx = re.compile(r'''
-    #             ([^<]*)                             # Before tag.
-    #             <(?P<tag>q|w|transChange|note)      # Tag name.
-    #             ([^>]*)>                            # Tag attributes.
-    #             ([\w\W]*?)</(?P=tag)>               # Tag text and end.
-    #             ([^<]*)                             # Between tags.
-    #             ''', re.I | re.X)
-    #     divname_regx = re.compile(r'''
-    #                 (?:<seg>)?
-    #                 <(?:divineName)>+
-    #                 ([^<]*?)
-    #                 ([\'s]*)
-    #                 </(?:divineName)>
-    #                 (?:</seg>)?
-    #                 ''', re.I | re.X)
-    #     xadded_regx = re.compile(r'<seg subType="x-added"[^>]*>([^<]*)</seg>',
-    #                              re.I)
-    #     div_upper = lambda m: m.group(1).upper() + m.group(2)
-    #     marker_regx = re.compile(r'.*marker="(.)".*', re.I)
-    #     term_dict = defaultdict(list)
-    #     len_attrs = 0
-    #
-    #     for verse_ref, verse_text in verse_iter:
-    #         #print(render_raw(verse_text, strongs, morph))
-    #         #print(render_raw2(verse_text, strongs, morph))
-    #         #continue
-    #         for term in search_terms.split():
-    #             term = term.replace('<', '').replace('>', '')
-    #             term = term.replace('{', '').replace('}', '')
-    #             v_text = ''
-    #             info_print('%s\n' % verse_text, tag=4)
-    #             term_regx = re.compile('\\b%s\\b' % term, re.I)
-    #             for match in tag_regx.finditer(verse_text):
-    #                 opt, tag_name, tag_attr, tag_text, punct = match.groups()
-    #                 tag_text = xadded_regx.sub('\\1', tag_text)
-    #                 if match.re.search(tag_text):
-    #                     match_list = match.re.findall(tag_text + punct)
-    #                 else:
-    #                     match_list = [match.groups()]
-    #                 for tag_tup in match_list:
-    #                     opt, tag_name, tag_attr, tag_text, punct = tag_tup
-    #                     info_print(tag_tup, tag=4)
-    #                     value_list = []
-    #                     attr_list = []
-    #                     strongs_list = []
-    #                     morph_list = []
-    #                     tag_text = divname_regx.sub(div_upper, tag_text)
-    #                     v_text += marker_regx.sub('\\1 ', opt) + tag_text + \
-    #                                                              punct
-    #                     if term.upper() in tag_attr:
-    #                         attr_list = [term.upper()]
-    #                     elif term_regx.search(tag_text):
-    #                         if strongs or not morph:
-    #                             strongs_list = strong_regx.findall(tag_attr)
-    #                         if morph:
-    #                             morph_list = morph_regx.findall(tag_attr)
-    #
-    #                     for lst in (strongs_list, morph_list, attr_list):
-    #                         if lst:
-    #                             attr_str = '%s"' % '", "'.join(lst)
-    #                             value_list = [attr_str, tag_text.strip()]
-    #                             term_dict[term].append({verse_ref: value_list})
-    #                             len_attrs = max(len(attr_str), len_attrs)
-    #             info_print(v_text, tag=4)
-    #     max_len_ref = len(max(ref_set, key=len))
-    #     for term, lst in term_dict.items():
-    #         print('%s:' % term)
-    #         for dic in lst:
-    #             ref, (attrs, s) = list(dic.items())[0]
-    #             s_l = '{1:{0}}: "{2}'.format(len_attrs, attrs, s)
-    #             print('\t{0:{1}}: "{2}"'.format(ref, max_len_ref, s_l))
-    #
-    #     exit()
-    #
-    # @_process_search
-    # def test4_search(self, search_terms, strongs=False, morph=False,
-    #                  added=True, case_sensitive=False, range_str=''):
-    #     """ A Test.
-    #
-    #     """
-    #
-    #     ref_set = self._index_dict.value_union(search_terms.split(),
-    #                                            case_sensitive)
-    #     if range_str:
-    #         # Only search through the supplied range.
-    #         ref_set.intersection_update(range_str)
-    #
-    #     if not ref_set:
-    #         exit()
-    #
-    #     ref_iter = iter(sorted(ref_set, key=sort_key))
-    #     # Get an iterator that will return tuples
-    #     # (verse_reference, verse_text).
-    #     verse_iter = VerseTextIter(ref_iter, strongs=strongs,
-    #                                morph=morph, render='raw',
-    #                                module=self._module_name)
-    #
-    #     found_set = set()
-    #     strong_regx = re.compile(r'strong:([GH]\d+)', re.I)
-    #     morph_regx = re.compile(r'(?:Morph|robinson):([\w-]*)', re.I)
-    #     tag_regx = re.compile(r'''
-    #             ([^<>]*)                                # Before tag.
-    #             <(?P<tag>seg|q|w|transChange|note|title)# Tag name.
-    #             ([^>]*)>                                # Tag attributes.
-    #             ([\w\W]*?)</(?P=tag)>                   # Tag text and end.
-    #             ([^<]*)                                 # Between tags.
-    #             ''', re.I | re.X)
-    #     divname_regx = re.compile(r'''
-    #                 <(?:divineName)>
-    #                 ([^<]*?)
-    #                 ([\'s]*)
-    #                 </(?:divineName)>
-    #                 ''', re.I | re.X)
-    #     div_upper = lambda m: m.group(1).upper() + m.group(2)
-    #     marker_regx = re.compile(r'.*marker="(.)".*', re.I)
-    #     term_dict = defaultdict(list)
-    #     len_attrs = 0
-    #
-    #     def recurse_tag(text, term, verse_ref, ctag_attr=''):
-    #         """ Recursively parses raw verse text using regular expressions,
-    #         and a list of dictionaries of the search term and any attributes
-    #         with its text.
-    #
-    #         """
-    #
-    #         term_list = []
-    #         for match in tag_regx.finditer(text):
-    #             value_list = []
-    #             attr_list = []
-    #             strongs_list = []
-    #             morph_list = []
-    #             opt, tag_name, tag_attr, tag_text, punct = match.groups()
-    #             if match.re.search(tag_text):
-    #                 term_list.extend(recurse_tag(tag_text, term, verse_ref,
-    #                                              tag_attr))
-    #             else:
-    #                 info_print((opt, tag_name, tag_attr, tag_text, punct),
-    #                            tag=4)
-    #                 if marker_regx.match(opt):
-    #                     opt = ''
-    #                 tag_text = opt + divname_regx.sub(div_upper,
-    #                                                   tag_text) + punct
-    #                 if term.upper() in tag_attr or term.upper() in ctag_attr:
-    #                     attr_list = [term.upper()]
-    #                 elif term_regx.search(tag_text):
-    #                     if strongs or not morph:
-    #                         strongs_list.extend(strong_regx.findall(tag_attr))
-    #                         strongs_list.extend(strong_regx.findall(ctag_attr))
-    #                     if morph:
-    #                         morph_list.extend(morph_regx.findall(tag_attr))
-    #                         morph_list.extend(morph_regx.findall(ctag_attr))
-    #                 for lst in (strongs_list, morph_list, attr_list):
-    #                     if lst:
-    #                         a_str = '%s"' % '", "'.join(lst)
-    #                         value_list = [a_str, tag_text.strip()]
-    #                         term_list.append({verse_ref: value_list})
-    #         return term_list
-    #
-    #     for verse_ref, verse_text in verse_iter:
-    #         #print(render_raw(verse_text, strongs, morph))
-    #         #print(render_raw2(verse_text, strongs, morph))
-    #         #continue
-    #         for term in search_terms.split():
-    #             term = term.replace('<', '').replace('>', '')
-    #             term = term.replace('{', '').replace('}', '')
-    #             v_text = ''
-    #             info_print('%s\n' % verse_text, tag=4)
-    #             term_regx = re.compile('\\b%s\\b' % term, re.I)
-    #             value_list = recurse_tag(verse_text, term, verse_ref)
-    #             if value_list:
-    #                 for i in value_list:
-    #                     len_attrs = max(len(i[verse_ref][0]), len_attrs)
-    #                 term_dict[term].extend(value_list)
-    #
-    #     max_len_ref = len(max(ref_set, key=len))
-    #     for term, lst in term_dict.items():
-    #         print('%s:' % term)
-    #         for dic in lst:
-    #             ref, (attrs, s) = list(dic.items())[0]
-    #             s_l = '{1:{0}}: "{2}'.format(len_attrs, attrs, s)
-    #             print('\t{0:{1}}: "{2}"'.format(ref, max_len_ref, s_l))
-    #
-    #     return set()
-    #
-    # concordance_search = test4_search
+    @classmethod
+    def search_terms_to_regex(cls, search_terms, case_sensitive,
+                              word_bound='\\\\b', extra_space='',
+                              sloppy=False, is_regex=False):
+        """ Build a regular expression from the search_terms to match a verse
+        in the Bible.
+
+        """
+
+        # Set the flags for the regular expression.
+        flags = re.I if not case_sensitive else 0
+
+        if is_regex:
+            reg_str = search_terms
+            info_print('\nUsing regular expression: %s\n' % reg_str, tag=2)
+
+            try:
+                return re.compile(reg_str, flags)
+            except Exception as err:
+                print("An error occured while compiling the highlight "
+                      "regular expression %s: %s." % (reg_str, err),
+                      " There will be no highlighting.\n", file=sys.stderr)
+                return re.compile(r'')
+
+        # This will skip words.
+        not_words_str = r'\b\w+\b'
+        # This will skip Strong's Numbers.
+        not_strongs_str = r'<[^>]*>'
+        # This wil skip Morphological Tags.
+        not_morph_str = r'\{[^\}]*\}'
+        # This will skip all punctuation.  Skipping ()'s is a problem for
+        # searching Morphological Tags, but it is necessary for the
+        # parenthesized words.  May break highlighting.
+        not_punct_str = r'[\s,\?\!\.;:\\/_\(\)\[\]"\'-]'
+        # This will skip ansi color.
+        not_color_str = r'\033\[[\d;]*m'
+        # Match all *'s
+        star_regx = re.compile(r'\*')
+
+        # Hold the string that fills space between search terms.
+        space_str = ''
+
+        # Get stars past so we can replace them with '\w*' later.
+        temp_str, word_count = star_regx.subn(r'_star_', search_terms)
+
+        # Hack to get rid of unwanted characters.
+        temp_str = cls._non_alnum_regx.sub(' ', temp_str).split()
+        temp_str = ' '.join(temp_str)
+        # Phrases will have spaces in them
+        phrase = bool(cls._whitespace_regx.search(temp_str))
+        # Escape the morphological tags, and also find how many there are.
+        temp_str, morph_count = cls._morph_regx.subn(cls._escape_morph,
+                                                         temp_str)
+        # Make all Strong's Numbers uppercase, also find how many there are.
+        temp_str, strongs_count = cls._strongs_regx.subn(cls._fix_strongs,
+                                                         temp_str)
+        # Select all words.
+        #repl = '(\\\\b\\1\\\\b)'
+        # This works:
+        # temp_str, word_count = \
+        #       cls._word_regx.subn('{0}(\\1){0}'.format(word_bound), temp_str)
+        repl = '({0}(\\1){0})'.format(word_bound)
+        temp_str, word_count = cls._word_regx.subn(repl, temp_str)
+        # Replace what used to be *'s with '\w*'.
+        temp_str = temp_str.replace('_star_', '\w*')
+
+        # All the Strong's and Morphology were changed in the previous
+        # substitution, so if that number is greater than the number of
+        # Strong's plus Morphology then there were words in the search terms.
+        # I do this because I don't know how to only find words.
+        words_found = (strongs_count + morph_count) < word_count
+        if phrase:
+            # Build the string that is inserted between the items in the
+            # search string.
+            space_str = r'(?:%s%s' % (not_punct_str, extra_space)
+            if not bool(strongs_count) or sloppy:
+                # Skip over all Strong's Numbers.
+                space_str = r'%s|%s' % (space_str, not_strongs_str)
+            if not bool(morph_count) or sloppy:
+                # Skip all Morphological Tags.
+                space_str = r'%s|%s' % (space_str, not_morph_str)
+            if not words_found or bool(morph_count) or bool(strongs_count) or \
+                    sloppy:
+                # Skip words.  If word attributes are in the search we can
+                # skip over words and still keep it a phrase.
+                space_str = r'%s|%s' % (space_str, not_words_str)
+            # Finally make it not greedy.
+            space_str = r'%s)*?' % space_str
+        else:
+            space_str = ''
+        # Re-combine the search terms with the regular expression string
+        # between each element.
+        reg_str = space_str.join(temp_str.split())
+        info_print('\nUsing regular expression: %s\n' % reg_str, tag=2)
+
+        try:
+            return re.compile(reg_str, flags)
+        except Exception as err:
+            print("An error occured while compiling the highlight "
+                  "regular expression %s: %s." % (reg_str, err),
+                  " There will be no highlighting.\n", file=sys.stderr)
+
+            return re.compile(r'')
+
+    def _sorted_iter(self, verse_ref_set):
+        """ Returns an iterator over a sorted version of verse_ref_set.
+
+        """
+
+        # Speed up the iteration by first sorting the range.
+        return iter(sorted(verse_ref_set, key=sort_key))
+
+    def _clean_text(self, text):
+        """ Return a clean (only alphanumeric) text of the provided string.
+
+        """
+
+        # Do we have to use two regular expressions to do this.
+        # Replace all non-alphanumeric characters with a space.
+        temp_text = self._non_alnum_regx.sub(' ', text)
+        # Replace one or more spaces with one space.
+        clean_text = self._fix_regx.sub(' ', temp_text)
+
+        return clean_text.strip()
+
+    def _fix_strongs_morph(self, search_terms):
+        """ Make any Strong's or Morphology uppercase, put parenthesis around
+        the Morphological Tags, and put <>'s around the Strong's Numbers.
+
+        """
+
+        # Capitalize all strongs numbers and remove the <> from them.
+        temp_str = self._strongs_regx.sub(self._fix_strongs, search_terms)
+        # Capitalize all morphological tags and make sure they are in
+        # parenthesis.
+        temp_str = self._morph_regx.sub(self._fix_morph, temp_str)
+
+        return temp_str
+
+    def _process_search(func):
+        """ Returns a wrapper function that processes the search terms, calls
+        the wrapped function, and, if applicable, confines the resulting verse
+        set to a range.
+
+        """
+
+        @wraps(func)
+        def wrapper(self, search_terms, strongs=False, morph=False,
+                    added=True, case_sensitive=False, range_str=''):
+            """ Process the search terms according to the wrapped functions
+            requirements, then apply the range, if given, to the returned set
+            of verses.
+
+            """
+
+            if func.__name__ in ['sword_search']:
+                if not Sword:
+                    print("Sword library not found.")
+                    return
+
+            if not isinstance(search_terms, str):
+                # Combine the terms for use by the different methods.
+                search_terms = ' '.join(search_terms)
+
+            # Get a valid set of verse references that conform to the passed
+            # range.
+            range_set = parse_verse_range(range_str)
+
+            if func.__name__ not in ['regex_search', 'partial_word_search']:
+                # Try to catch and fix any Strong's Numbers or Morphological
+                # Tags.
+                search_terms = self._fix_strongs_morph(search_terms)
+
+            # Regular expression and combined searches get the search terms as
+            # they were passed.
+            if func.__name__ in ['multiword_search', 'anyword_search',
+                                 'phrase_search', 'mixed_phrase_search']:
+                # Get rid of any non-alphanumeric or '-' characters from
+                # the search string.
+                search_str = self._clean_text(search_terms).strip()
+                if strongs or morph:
+                    # Strong's numbers and Morphological tags are all
+                    # uppercase.  This is only required if the Morphological
+                    # Tags were not surrounded by parenthesis.
+                    search_str = search_str.upper().strip()
+            else:
+                search_str = search_terms
+
+            # Get the set of found verses.
+            found_set = func(self, search_str, strongs, morph, added,
+                             case_sensitive, range_set)
+
+            # The phrase, regular expression, and combined searches apply the
+            # range before searching, so only multi-word and any-word searches
+            # have it applied here.
+            if func.__name__ in ['multiword_search', 'anyword_search',
+                                 'partial_word_search']:
+                if range_set:
+                    found_set.intersection_update(range_set)
+            return found_set
+
+        # Return wrapper function.
+        return wrapper
+
+    @_process_search
+    def combined_search(self, search_terms, strongs=False, morph=False,
+                        added=True, case_sensitive=False, range_str=''):
+        """ combined_search(self, search_terms, strongs=False, morph=False,
+                        case_sensitive=False, range_str=''): ->
+        Perform a combined search.  Search terms could be
+        'created NOT (and OR but)' and it would find all verses with the word
+        'created' in them and remove any verse that had either 'and' or 'but.'
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        info_print("Searching for '%s'..." % search_terms, tag=1)
+
+        # Process the search_terms.
+        arg_parser = CombinedParse(search_terms)
+        # Get the list of words and/or phrases to include.
+        word_list = arg_parser.word_list
+        # Get the list of words and/or phrases to NOT include.
+        not_list = arg_parser.not_list
+
+        phrase_search = self.phrase_search
+        multiword_search = self.multiword_search
+
+        def combine_proc(str_list):
+            """ Performs combined search on the strings in str_list, and
+            returns a set of references that match.
+
+            """
+
+            and_it = False
+            temp_set = set()
+            for word in str_list:
+                # A '+' before or after a word means it should have a phrase
+                # search done on it and the words with it.
+                if '+' in word:
+                    # Do a phrase search on the word string.
+                    result_set = phrase_search(word.replace('+', ' '), strongs,
+                                               morph, case_sensitive,
+                                               range_str)
+                elif word == '&':
+                    # Combine the next search results with this one.
+                    and_it = True
+                    continue
+                else:
+                    # Do a multi-word search on the word string.
+                    result_set = multiword_search(word, strongs, morph,
+                                                  case_sensitive, range_str)
+                if and_it:
+                    # The previous word said to find verses that match both.
+                    temp_set.intersection_update(result_set)
+                    and_it = False
+                else:
+                    # Only keep the verses that have either one group or the
+                    # other but not both.
+                    temp_set.symmetric_difference_update(result_set)
+
+            return temp_set
+
+        # Remove any verses that have the NOT words in them.
+        found_set = combine_proc(word_list).difference(combine_proc(not_list))
+
+        return found_set
+
+    @_process_search
+    def combined_phrase_search(self, search_terms, strongs=False, morph=False,
+                               added=True, case_sensitive=False, range_str=''):
+        """ combined_phrase_search(self, search_terms, strongs=False,
+                morph=False, case_sensitive=False, range_str=''): ->
+        Perform a combined phrase search.  Search terms could be
+        'created NOT (and AND but)' and it would find all verses with the word
+        'created' in them and remove any verse that had the phrase 'and but.'
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        info_print("Searching for '%s'..." % search_terms, tag=1)
+
+        # Process the search_terms.
+        arg_parser = CombinedParse(search_terms)
+        # Get the list of words and/or phrases to include.
+        word_list = arg_parser.word_list
+        # Get the list of words and/or phrases to NOT include.
+        not_list = arg_parser.not_list
+
+        phrase_search = self.phrase_search
+
+        def combine_proc(str_list):
+            """ Performs combined phrase search on the strings in str_list, and
+            returns a set of references that match.
+
+            """
+
+            temp_set = set()
+            for word in str_list:
+                # Do a phrase search on the word string.
+                result_set = phrase_search(word.replace('+', ' '), strongs,
+                                           morph, case_sensitive,
+                                           range_str)
+                # Include all the verses that have any of the word groups.
+                temp_set.update(result_set)
+
+            return temp_set
+
+        # Remove any verses that have the NOT words in them.
+        found_set = combine_proc(word_list).difference(combine_proc(not_list))
+
+        return found_set
+
+    @_process_search
+    def multiword_search(self, search_terms, strongs=False, morph=False,
+                         added=True, case_sensitive=False, range_str=''):
+        """ multiword_search(self, search_terms, strongs=False, morph=False,
+                  case_sensitive=False, range_str='') ->
+        Perform a multiword search using the search_terms.
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        info_print("Searching for verses with all these words "
+                   "'%s'..." % ', '.join(search_terms.split()), tag=1)
+
+        # All that needs to be done is find all references with all the
+        # searched words in them.
+        found_set = self._index_dict.value_intersect(search_terms.split(),
+                                                     case_sensitive)
+
+        return found_set
+
+    @_process_search
+    def eitheror_search(self, search_terms, strongs=False, morph=False,
+                        added=True, case_sensitive=False, range_str=''):
+        """ eitheror_search(self, search_terms, strongs=False, morph=False,
+                case_sensitive=False, range_str='') ->
+        Perform a search returning any verse with one and only one of the terms
+        searched for.
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        info_print("Searching for verses with one and not all of these words "
+                   "'%s'..." % ', '.join(search_terms.split()), tag=1)
+
+        # Any verse with one and only one of the searched words.
+        found_set = self._index_dict.value_sym_diff(search_terms.split(),
+                                                    case_sensitive)
+
+        return found_set
+
+    @_process_search
+    def anyword_search(self, search_terms, strongs=False, morph=False,
+                       added=True, case_sensitive=False, range_str=''):
+        """ anyword_search(self, search_terms, strongs=False, morph=False,
+                case_sensitive=False, range_str='') ->
+        Perform a search returning any verse with one or more of the search
+        terms.
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        info_print("Searching for verses with any of these words "
+                   "'%s'..." % ', '.join(search_terms.split()), tag=1)
+
+        # Any verse with one or more of the searched words.
+        found_set = self._index_dict.value_union(search_terms.split(),
+                                                 case_sensitive)
+
+        return found_set
+
+    @_process_search
+    def partial_word_search(self, search_terms, strongs=False, morph=False,
+                           added=True, case_sensitive=False, range_str=''):
+        """ partial_word_search(self, search_terms, strongs=False, morph=False,
+                case_sensitive=False, range_str='') ->
+        Perform a search returning any verse with one or more words matching
+        the partial words given in the search terms.  Partial words are markes
+        tih *'s (e.g. '*guil*' will match any word with 'guil' in it such as
+        'guilt' or 'beguile.'
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        info_print("Searching for verses with any of these partial words "
+                   "'%s'..." % ', '.join(search_terms.split()), tag=1)
+
+        #found_set = self._index_dict.value_union(
+                #self._words_from_partial(search_terms, case_sensitive),
+                #case_sensitive)
+        search_list = search_terms.split()
+        found_set = self._index_dict.from_partial(search_list, case_sensitive)
+
+        return found_set
+
+    def _words_from_partial(self, partial_word_list, case_sensitive=False):
+        """ Search through a list of partial words and yield words that match.
+
+        """
+
+        flags = re.I if not case_sensitive else 0
+
+        # Split the search terms and search through each word key in the index
+        # for any word that contains the partial word.
+        word_list = partial_word_list.split()
+        for word in self._index_dict['_words_']:
+            for partial_word in word_list:
+                # A Regular expression that matches any number of word
+                # characters for every '*' in the term.
+                reg_str = '\\b%s\\b' % partial_word.replace('*', '\w*')
+                try:
+                    word_regx = re.compile(reg_str, flags)
+                except Exception as err:
+                    print('There is a problem with the regular expression '
+                          '%s: %s' % (reg_str, err), file=sys.stderr)
+                    exit()
+                if word_regx.match(word):
+                    yield word
+
+    def _process_phrase(func):
+        """ Returns a wrapper function for wrapping phrase like searches.
+
+        """
+
+        @wraps(func)
+        def wrapper(self, search_terms, strongs=False, morph=False,
+                    added=True, case_sensitive=False, range_str=''):
+            """ Gets a regular expression from the wrapped function, then
+            builds a set of verse references to search, finally it calls the
+            searching function with the regular expression and the verse
+            reference iterator, and returns the resulting set of references.
+
+            """
+
+            search_regx = func(self, search_terms, strongs, morph, added,
+                               case_sensitive, range_str)
+
+            # First make sure we are only searching verses that have all the
+            # search terms in them.
+            search_list = search_terms.split()
+            if '*' in search_terms:
+                ref_set = self._index_dict.from_partial(search_list,
+                                                        case_sensitive,
+                                                        common_limit=5000)
+            else:
+                ref_set = self._index_dict.value_intersect(search_list,
+                                                           case_sensitive)
+            if range_str:
+                # Only search through the supplied range.
+                ref_set.intersection_update(range_str)
+
+            # No need to search for a single word phrase.
+            if len(search_terms.split()) == 1:
+                return ref_set
+
+            # Sort the list so it may be a little faster.  Only needed if we're
+            # using the sword module to look them up.
+            ref_iter = self._sorted_iter(ref_set)
+
+            # Disable Strong's and Morphological if only words are used.
+            strongs = bool(self._strongs_regx.search(search_terms))
+            morph = bool(self._morph_regx.search(search_terms))
+
+            return self.find_from_regex(ref_iter, search_regx, strongs, morph)
+
+        return wrapper
+
+    @_process_search
+    @_process_phrase
+    def ordered_multiword_search(self, search_terms, strongs=False,
+                                 morph=False, added=True, case_sensitive=False,
+                                 range_str=''):
+        """ ordered_multiword_search(self, search_terms, strongs=False,
+            morph=False, case_sensitive=False, range_str='') ->
+        Perform an ordered multiword search.  Like a multiword search, but all
+        the words have to be in order.
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        info_print("Searching for verses with these words in order "
+                   "'%s'..." % search_terms, tag=1)
+
+        return self.search_terms_to_regex(search_terms, case_sensitive,
+                                          sloppy=True)
+
+    @_process_search
+    @_process_phrase
+    def phrase_search(self, search_terms, strongs=False, morph=False,
+                      added=True, case_sensitive=False, range_str=''):
+        """ phrase_search(self, search_terms, strongs=False, morph=False,
+               case_sensitive=False, range_str='') ->
+        Perform a phrase search.
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        info_print("Searching for verses with this phrase "
+                   "'%s'..." % search_terms, tag=1)
+
+        # Make all the terms the same case if case doesn't matter.
+        flags = re.I if not case_sensitive else 0
+
+        if strongs:
+            # Match strongs phrases.
+            search_reg_str = search_terms.replace(' ', r'[^<]*')
+        elif morph:
+            # Match morphological phrases.
+            search_reg_str = search_terms.replace(' ', r'[^\{]*')
+        else:
+            # Match word phrases
+            search_reg_str = '\\b%s\\b' % search_terms.replace(' ',
+                    r'\b(<[^>]*>|\{[^\}]*\}|\W)*\b')
+
+        # Make a regular expression from the search terms.
+        return re.compile(search_reg_str, flags)
+
+    @_process_search
+    @_process_phrase
+    def mixed_phrase_search(self, search_terms, strongs=False, morph=False,
+                            added=True, case_sensitive=False, range_str=''):
+        """ mixed_phrase_search(self, search_terms, strongs=False, morph=False,
+        case_sensitive=False, range_str='') ->
+        Perform a phrase search.
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        info_print("Searching for verses with this phrase "
+                   "'%s'..." % search_terms, tag=1)
+
+        # Make a regular expression from the search terms.
+        return self.search_terms_to_regex(search_terms, case_sensitive)
+
+    @_process_search
+    def regex_search(self, search_terms, strongs=False, morph=False,
+                     added=True, case_sensitive=False, range_str=''):
+        """ regex_search(self, search_terms, strongs=False, morph=False,
+              case_sensitive=False, range_str='') ->
+        Perform a regular expression search.
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        info_print("Searching for regular expression '%s'..." % search_terms,
+                   tag=1)
+
+        # re.I is case insensitive.
+        flags = re.I if not case_sensitive else 0
+
+        try:
+            # Make a regular expression from the search_terms.
+            search_regx = re.compile(r'%s' % search_terms, flags)
+        except Exception as err:
+            print('There is a problem with the regular expression "%s": %s' % \
+                    (search_terms, err), file=sys.stderr)
+            exit()
+
+        if range_str:
+            # Only search through the supplied range.
+            ref_iter = self._sorted_iter(range_str)
+        else:
+            # Search the entire Bible.
+            ref_iter = VerseIter('Genesis 1:1')
+
+        return self.find_from_regex(ref_iter, search_regx, strongs, morph,
+                                    tag=1, try_clean=True)
+
+    def find_from_regex(self, ref_iter, search_regex, strongs=False,
+                        morph=False, added=True, tag=3, try_clean=False):
+        """ Iterates through all the verses in the ref iter iterator and
+        returns a list of verses whose text matches search_regx.
+
+        """
+
+        # Get an iterator that will return tuples
+        # (verse_reference, verse_text).
+        verse_iter = IndexedVerseTextIter(ref_iter, strongs=strongs,
+                                          morph=morph, added=added,
+                                          module=self._module_name)
+
+        found_set = set()
+        for verse_ref, verse_text in verse_iter:
+            info_print('\033[%dD\033[KSearching...%s' % \
+                       (len(verse_ref) + 20, verse_ref), end='', tag=tag)
+
+            # Search for matches in the verse text.
+            if search_regex.search(verse_text):
+                found_set.add(verse_ref)
+            elif try_clean and not strongs and not morph:
+                # Should we do this or should we trust the user knows what
+                # puctuation are in the verses?
+                clean_verse_text = self._clean_text(verse_text)
+                if search_regex.search(clean_verse_text):
+                    found_set.add(verse_ref)
+
+        info_print("...Done.", tag=tag)
+
+        return found_set
+
+    def mixed_search(self, search_terms, strongs=False, morph=False,
+                     added=True, case_sensitive=False, range_str=''):
+        """ mixed_search(self, search_terms, strongs=False, morph=False,
+               case_sensitive=False, range_str='') ->
+        Perform a mixed search.
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            added           -   Search in the added text (i.e. italics).
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+
+        """
+
+        found_set = set()
+        not_set = set()
+        and_set = set()
+        or_set = set()
+        xor_set = set()
+
+        combine_dict = {
+                '!': not_set.update,
+                '+': and_set.intersection_update,
+                '|': or_set.update,
+                '^': xor_set.symmetric_difference_update,
+                }
+
+        for term in search_terms:
+            if term[0] in '!+^|':
+                # Set the correct combining function, and cleanup the item.
+                if term[0] == '+' and not and_set:
+                    # All of these verses go in the output.
+                    combine_func = and_set.update
+                else:
+                    combine_func = combine_dict[term[0]]
+                term = term[1:]
+            else:
+                if self._multi and found_set:
+                    # If multiword is default and found_set is not empty
+                    # make all search terms appear in the output.
+                    combine_func = found_set.intersection_update
+                else:
+                    # Any of these verses could be in the output
+                    combine_func = found_set.update
+
+            if term.startswith('&'):
+                # Allow regular expression searching.
+                term = term[1:]
+                search_func = self.regex_search
+            elif ' ' in term:
+                # Search term is a quoted string, so treat it like a phrase.
+                if term.startswith('~'):
+                    # ~'s trigger ordered multiword or sloppy phrase search.
+                    term = term[1:]
+                    search_func = self.ordered_multiword_search
+                else:
+                    search_func = self.mixed_phrase_search
+            elif '*' in term:
+                # Search for partial words.
+                search_func = self.partial_word_search
+            else:
+                # A single word should be (multi/any)-word.
+                search_func = self.multiword_search
+
+            # Perform a strongs search.
+            strongs = bool(self._strongs_regx.match(term.upper()))
+            # Perform a morpholagical search.
+            morph = bool(self._morph_regx.match(term.upper()))
+
+            # Search for words or phrases.
+            temp_set = search_func(term, strongs, morph, added, case_sensitive,
+                                   range_str)
+
+            # Add the results to the correct set.
+            combine_func(temp_set)
+
+        # Update the result set.
+        found_set.update(or_set)
+        found_set.update(xor_set)
+
+        if and_set and found_set:
+            # Make sure all the verses that are in the output have the words
+            # or phrases that hade a '+' in front of them.
+            found_set = and_set.union(found_set.intersection(and_set))
+        elif and_set:
+            # Found set must be empty to fill it with and_set's contents.
+            found_set.update(and_set)
+
+        # Finally remove all the verses that are in the not_set.
+        found_set.difference_update(not_set)
+
+        return found_set
+
+    def sword_search(self, search_terms, strongs=False, morph=False,
+                     added=True, case_sensitive=False, range_str='',
+                     search_type='lucene'):
+        """ sword_search(self, search_terms, strongs=False, morph=False,
+                case_sensitive=False, range_str='', search_type=-4) ->
+        Use the sword module to search for the terms.
+
+            search_terms    -   Terms to search for.
+            strongs         -   Search for Strong's Number phrases.
+            morph           -   Search for Morphological Tag phrases.
+            case_sensitive  -   Perform a case sensitive search.
+            range_str       -   A verse range to limit the search to.
+            search_type     -   What search type to use.
+
+        """
+
+        search_terms = ' '.join(search_terms)
+
+        info_print("Searching using the Sword library for "
+                   "'%s'..." % search_terms, tag=1)
+
+        found_set = set()
+
+        search_type_dict = {
+                'regex': 0,
+                'phrase': -1,
+                'multiword': -2,
+                'entryattrib': -3,   # (e.g. Word//Lemma//G1234)
+                'lucene': -4
+                }
+
+        try:
+            # Render the text as plain.
+            markup = Sword.MarkupFilterMgr(Sword.FMT_PLAIN)
+            # Don't own this or it will crash.
+            markup.thisown = False
+            mgr = Sword.SWMgr(markup)
+            # Load the module.
+            module = mgr.getModule(self._module_name)
+
+            # Set the search type based on the search_type argument.
+            search_type = search_type_dict.get(search_type.lower(), -4)
+
+            # Make sure we can search like this.
+            if not module.isSearchSupported(search_terms, search_type):
+                print("Search not supported", file=sys.stderr)
+                return found_set()
+
+            # Get the range key.
+            if not range_str:
+                range_str = 'Genesis-Revelation'
+            range_k = Sword.VerseKey().parseVerseList(range_str, 'Genesis 1:1',
+                                                      True)
+
+            flags = re.I if not case_sensitive else 0
+
+            if strongs:
+                # Search for strongs numbers.
+                # I don't know how to search for morphological tags using
+                # Swords search function.
+                prefix = 'lemma:'
+                for term in ','.join(search_terms.split()).split(','):
+                    if not term.startswith('lemma:'):
+                        # Make the term start with lemma: so sword will find
+                        # it.
+                        term = '%s%s' % (prefix, term)
+                    # Perform the search.
+                    resource = module.doSearch(term, search_type, flags,
+                                               range_k)
+                    # Get the list of references from the range text.
+                    found_set.update(resource.getRangeText().split('; '))
+            else:
+                # Perform the search.
+                resource = module.doSearch(search_terms, search_type, flags,
+                                           range_k)
+                # Get the list of references from the range text.
+                found_set.update(resource.getRangeText().strip().split('; '))
+        except Exception as err:
+            print("There was a problem while searching: %s" % err,
+                  file=sys.stderr)
+
+        found_set.discard('')
+
+        return found_set
+
+    @_process_search
+    def test_search(self, search_terms, strongs=False, morph=False,
+                    added=True, case_sensitive=False, range_str=''):
+        """ A Test.
+
+        """
+
+        ref_set = self._index_dict.value_union(search_terms.split(),
+                                                 case_sensitive)
+        if range_str:
+            # Only search through the supplied range.
+            ref_set.intersection_update(range_str)
+
+        ref_list = sorted(ref_set, key=sort_key)
+
+        term_dict = defaultdict(list)
+        raw_dict = RawDict(iter(ref_list), self._module_name)
+        words_len = 0
+        for verse_ref, (verse_text, verse_dict) in raw_dict:
+            for term in search_terms.split():
+                if self._strongs_regx.match(term):
+                    num = self._strongs_regx.sub('\\1', term)
+                    words = set(verse_dict[num.upper()])
+                    if words:
+                        term_dict[num.upper()].append({verse_ref: words})
+                elif self._morph_regx.match(term):
+                    tag = self._morph_regx.sub('\\1', term)
+                    words = set(verse_dict[tag.upper()])
+                    if words:
+                        term_dict[tag.upper()].append({verse_ref: words})
+                else:
+                    for key, value in verse_dict['_words'][0].items():
+                        if ' %s ' % term.lower() in ' %s ' % key.lower():
+                            attr_dict = value[0]
+                            if strongs and 'strongs' in attr_dict:
+                                attr_list = attr_dict['strongs']
+                                attr_list.append(key)
+                                term_dict[term].append({verse_ref: attr_list})
+                            if morph and 'morph' in attr_dict:
+                                attr_list = attr_dict['morph']
+                                attr_list.append(key)
+                                words_len = max(len(attr_list), words_len)
+                                term_dict[term].append({verse_ref: attr_list})
+        len_longest_ref = len(max(ref_set, key=len))
+        for key, value in term_dict.items():
+            words_len = max([len(i) for d in value for i, v in d.items()])
+            print('%s:' % key)
+            for dic in value:
+                ref, words = tuple(dic.items())[0]
+                if isinstance(words, list):
+                    w_str = '"%s"' % '", "'.join(words[:-1])
+                    l_str = '"%s"' % words[-1]
+                    words_str = '{0:{2}}: {1}'.format(w_str, l_str, words_len)
+                else:
+                    words_str = '"%s"' % '", "'.join(words)
+                print('\t{0:{1}}: {2}'.format(ref, len_longest_ref, words_str))
+                    #print('\t{0:{1}}: "{2}"'.format(ref, len_longest_ref,
+                    #                                 '", "'.join(words)))
+        exit()
+
+    @_process_search
+    def test2_search(self, search_terms, strongs=False, morph=False,
+                     added=True, case_sensitive=False, range_str=''):
+        """ A Test.
+
+        """
+
+        ref_set = self._index_dict.value_union(search_terms.split(),
+                                               case_sensitive)
+        if range_str:
+            # Only search through the supplied range.
+            ref_set.intersection_update(range_str)
+
+        ref_iter = iter(sorted(ref_set, key=sort_key))
+        # Get an iterator that will return tuples
+        # (verse_reference, verse_text).
+        verse_iter = IndexedVerseTextIter(ref_iter, strongs=True,
+                                          morph=morph, added=added,
+                                          module=self._module_name)
+
+        # This will skip words.
+        not_words_str = r'\b\w+\b'
+        # This will skip Strong's Numbers.
+        not_strongs_str = r'<[^>]*>'
+        # This wil skip Morphological Tags.
+        not_morph_str = r'\{[^\}]*\}'
+        # This will skip all punctuation.  Skipping ()'s is a problem for
+        # searching Morphological Tags, but it is necessary for the
+        # parenthesized words.  May break highlighting.
+        not_punct_str = r'[\s,\?\!\.;:\\/_\(\)\[\]"\'-]'
+        max_ref_len = len(max(ref_set, key=len))
+        found_set = set()
+        term_dict = defaultdict(list)
+        for verse_ref, verse_text in verse_iter:
+            for term in search_terms.split():
+                if self._strongs_regx.match(term):
+                    test_regx = re.compile(r'''
+                            \s
+                            ((?:\b\w+\b|[\s,\?\!\.;:\\/_\(\)\[\]"\'-])+)
+                            \s
+                            ((?:%s)+)
+                            ''' % term, re.I | re.X)
+                elif self._morph_regx.match(term):
+                    test_regx = re.compile(r'''
+                            \s((?:\b\w+\b|[\s,\?\!\.;:\\/_\(\)\[\]"\'-])+)
+                            (?:<[^>]*>|\s)+
+                            ((?:%s)+)
+                            ''' % term, re.I | re.X)
+                else:
+                    test_regx = re.compile(r'''
+                            ((?:\b\w+\b|[\s,\?\!\.;:\\/_\(\)\[\]"\'-])*?
+                            %s
+                            (?:\b\w+\b|[\s,\?\!\.;:\\/_\(\)\[\]"\'-])+)+
+                            ((?:<[^>]*>|\{[^\}]*\}|\s)+)
+                            ''' % term, re.I | re.X)
+                for match in test_regx.finditer(verse_text):
+                    phrase, num = match.groups()
+                    phrase = phrase.strip(',').strip('.').strip()
+                    phrase = phrase.strip(';').strip('?').strip(':').strip()
+                    num = num.replace('<', '').replace('>', '')
+                    num = num.replace('{', '').replace('}', '')
+                    if not phrase or not num.strip():
+                        if not strongs:
+                            break
+                        print(verse_ref, verse_text)
+                        print(match.group(), match.groups())
+                        exit()
+                    num = '"%s"' % '", "'.join(num.split())
+                    term_dict[term].append(
+                            '\t{0:{1}}: {2:{4}}: "{3}"'.format(verse_ref,
+                                                               max_ref_len,
+                                                               num, phrase,
+                                                               18)
+                                          )
+        for term, lst in term_dict.items():
+            term = term.replace('<', '').replace('>', '')
+            term = term.replace('{', '').replace('}', '')
+            print('%s:\n%s' % (term, '\n'.join(lst)))
+        exit()
+
+    @_process_search
+    def test3_search(self, search_terms, strongs=False, morph=False,
+                     added=True, case_sensitive=False, range_str=''):
+        """ A Test.
+
+        """
+
+        ref_set = self._index_dict.value_union(search_terms.split(),
+                                               case_sensitive)
+        if range_str:
+            # Only search through the supplied range.
+            ref_set.intersection_update(range_str)
+
+        if not ref_set:
+            exit()
+
+        ref_iter = iter(sorted(ref_set, key=sort_key))
+        # Get an iterator that will return tuples
+        # (verse_reference, verse_text).
+        verse_iter = VerseTextIter(ref_iter, strongs=strongs,
+                                   morph=morph, render='raw',
+                                   module=self._module_name)
+
+        found_set = set()
+        strong_regx = re.compile(r'strong:([GH]\d+)', re.I)
+        morph_regx = re.compile(r'(?:Morph|robinson):([\w-]*)', re.I)
+        tag_regx = re.compile(r'''
+                ([^<]*)                             # Before tag.
+                <(?P<tag>q|w|transChange|note)      # Tag name.
+                ([^>]*)>                            # Tag attributes.
+                ([\w\W]*?)</(?P=tag)>               # Tag text and end.
+                ([^<]*)                             # Between tags.
+                ''', re.I | re.X)
+        divname_regx = re.compile(r'''
+                    (?:<seg>)?
+                    <(?:divineName)>+
+                    ([^<]*?)
+                    ([\'s]*)
+                    </(?:divineName)>
+                    (?:</seg>)?
+                    ''', re.I | re.X)
+        xadded_regx = re.compile(r'<seg subType="x-added"[^>]*>([^<]*)</seg>',
+                                 re.I)
+        div_upper = lambda m: m.group(1).upper() + m.group(2)
+        marker_regx = re.compile(r'.*marker="(.)".*', re.I)
+        term_dict = defaultdict(list)
+        len_attrs = 0
+
+        for verse_ref, verse_text in verse_iter:
+            #print(render_raw(verse_text, strongs, morph))
+            #print(render_raw2(verse_text, strongs, morph))
+            #continue
+            for term in search_terms.split():
+                term = term.replace('<', '').replace('>', '')
+                term = term.replace('{', '').replace('}', '')
+                v_text = ''
+                info_print('%s\n' % verse_text, tag=4)
+                term_regx = re.compile('\\b%s\\b' % term, re.I)
+                for match in tag_regx.finditer(verse_text):
+                    opt, tag_name, tag_attr, tag_text, punct = match.groups()
+                    tag_text = xadded_regx.sub('\\1', tag_text)
+                    if match.re.search(tag_text):
+                        match_list = match.re.findall(tag_text + punct)
+                    else:
+                        match_list = [match.groups()]
+                    for tag_tup in match_list:
+                        opt, tag_name, tag_attr, tag_text, punct = tag_tup
+                        info_print(tag_tup, tag=4)
+                        value_list = []
+                        attr_list = []
+                        strongs_list = []
+                        morph_list = []
+                        tag_text = divname_regx.sub(div_upper, tag_text)
+                        v_text += marker_regx.sub('\\1 ', opt) + tag_text + \
+                                                                 punct
+                        if term.upper() in tag_attr:
+                            attr_list = [term.upper()]
+                        elif term_regx.search(tag_text):
+                            if strongs or not morph:
+                                strongs_list = strong_regx.findall(tag_attr)
+                            if morph:
+                                morph_list = morph_regx.findall(tag_attr)
+
+                        for lst in (strongs_list, morph_list, attr_list):
+                            if lst:
+                                attr_str = '%s"' % '", "'.join(lst)
+                                value_list = [attr_str, tag_text.strip()]
+                                term_dict[term].append({verse_ref: value_list})
+                                len_attrs = max(len(attr_str), len_attrs)
+                info_print(v_text, tag=4)
+        max_len_ref = len(max(ref_set, key=len))
+        for term, lst in term_dict.items():
+            print('%s:' % term)
+            for dic in lst:
+                ref, (attrs, s) = list(dic.items())[0]
+                s_l = '{1:{0}}: "{2}'.format(len_attrs, attrs, s)
+                print('\t{0:{1}}: "{2}"'.format(ref, max_len_ref, s_l))
+
+        exit()
+
+    @_process_search
+    def test4_search(self, search_terms, strongs=False, morph=False,
+                     added=True, case_sensitive=False, range_str=''):
+        """ A Test.
+
+        """
+
+        ref_set = self._index_dict.value_union(search_terms.split(),
+                                               case_sensitive)
+        if range_str:
+            # Only search through the supplied range.
+            ref_set.intersection_update(range_str)
+
+        if not ref_set:
+            exit()
+
+        ref_iter = iter(sorted(ref_set, key=sort_key))
+        # Get an iterator that will return tuples
+        # (verse_reference, verse_text).
+        verse_iter = VerseTextIter(ref_iter, strongs=strongs,
+                                   morph=morph, render='raw',
+                                   module=self._module_name)
+
+        found_set = set()
+        strong_regx = re.compile(r'strong:([GH]\d+)', re.I)
+        morph_regx = re.compile(r'(?:Morph|robinson):([\w-]*)', re.I)
+        tag_regx = re.compile(r'''
+                ([^<>]*)                                # Before tag.
+                <(?P<tag>seg|q|w|transChange|note|title)# Tag name.
+                ([^>]*)>                                # Tag attributes.
+                ([\w\W]*?)</(?P=tag)>                   # Tag text and end.
+                ([^<]*)                                 # Between tags.
+                ''', re.I | re.X)
+        divname_regx = re.compile(r'''
+                    <(?:divineName)>
+                    ([^<]*?)
+                    ([\'s]*)
+                    </(?:divineName)>
+                    ''', re.I | re.X)
+        div_upper = lambda m: m.group(1).upper() + m.group(2)
+        marker_regx = re.compile(r'.*marker="(.)".*', re.I)
+        term_dict = defaultdict(list)
+        len_attrs = 0
+
+        def recurse_tag(text, term, verse_ref, ctag_attr=''):
+            """ Recursively parses raw verse text using regular expressions,
+            and a list of dictionaries of the search term and any attributes
+            with its text.
+
+            """
+
+            term_list = []
+            for match in tag_regx.finditer(text):
+                value_list = []
+                attr_list = []
+                strongs_list = []
+                morph_list = []
+                opt, tag_name, tag_attr, tag_text, punct = match.groups()
+                if match.re.search(tag_text):
+                    term_list.extend(recurse_tag(tag_text, term, verse_ref,
+                                                 tag_attr))
+                else:
+                    info_print((opt, tag_name, tag_attr, tag_text, punct),
+                               tag=4)
+                    if marker_regx.match(opt):
+                        opt = ''
+                    tag_text = opt + divname_regx.sub(div_upper,
+                                                      tag_text) + punct
+                    if term.upper() in tag_attr or term.upper() in ctag_attr:
+                        attr_list = [term.upper()]
+                    elif term_regx.search(tag_text):
+                        if strongs or not morph:
+                            strongs_list.extend(strong_regx.findall(tag_attr))
+                            strongs_list.extend(strong_regx.findall(ctag_attr))
+                        if morph:
+                            morph_list.extend(morph_regx.findall(tag_attr))
+                            morph_list.extend(morph_regx.findall(ctag_attr))
+                    for lst in (strongs_list, morph_list, attr_list):
+                        if lst:
+                            a_str = '%s"' % '", "'.join(lst)
+                            value_list = [a_str, tag_text.strip()]
+                            term_list.append({verse_ref: value_list})
+            return term_list
+
+        for verse_ref, verse_text in verse_iter:
+            #print(render_raw(verse_text, strongs, morph))
+            #print(render_raw2(verse_text, strongs, morph))
+            #continue
+            for term in search_terms.split():
+                term = term.replace('<', '').replace('>', '')
+                term = term.replace('{', '').replace('}', '')
+                v_text = ''
+                info_print('%s\n' % verse_text, tag=4)
+                term_regx = re.compile('\\b%s\\b' % term, re.I)
+                value_list = recurse_tag(verse_text, term, verse_ref)
+                if value_list:
+                    for i in value_list:
+                        len_attrs = max(len(i[verse_ref][0]), len_attrs)
+                    term_dict[term].extend(value_list)
+
+        max_len_ref = len(max(ref_set, key=len))
+        for term, lst in term_dict.items():
+            print('%s:' % term)
+            for dic in lst:
+                ref, (attrs, s) = list(dic.items())[0]
+                s_l = '{1:{0}}: "{2}'.format(len_attrs, attrs, s)
+                print('\t{0:{1}}: "{2}"'.format(ref, max_len_ref, s_l))
+
+        return set()
+
+    concordance_search = test4_search
 
 
 class SearchCmd(Cmd):

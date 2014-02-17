@@ -795,7 +795,8 @@ def index(location='biblesearch'):
     """
 
     try:
-        bible_search = sword_search.Search(multiword=True)
+        # bible_search = sword_search.Search(multiword=True)
+        bible_search = sword_search.Test()
     except Exception as err:
         return "Error: {0}".format(err)
 
