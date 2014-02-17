@@ -800,6 +800,7 @@ def index(location='biblesearch'):
 
     """
 
+    return sword_search.INDEX_PATH
     if location == 'biblesearch':
         if request.get_cookie('javascript'):
             print('javascript: yep')
