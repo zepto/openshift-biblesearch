@@ -30,7 +30,7 @@ import re
 
 import sword_search
 from sword_search import build_highlight_regx, highlight_search_terms
-import errors
+# import errors
 
 
 # Global variables
@@ -106,22 +106,22 @@ TEMPLATE_PATH.insert(0, views_path)
 bible_app = Bottle()
 
 
-# def errors(error):
-#     """ Handle errors.
-#
-#     """
-#
-#     return template('error', error_no=error.args[0], error=error.args[1:])
-#
-# handler = {
-#     500: errors,
-#     404: errors,
-#     403: errors,
-#     401: errors,
-# }
+def errors(error):
+    """ Handle errors.
 
-# bible_app.error_handler = handler
-bible_app.error_handler = errors.handler
+    """
+
+    return template('error', error_no=error.args[0], error=error.args[1:])
+
+handler = {
+    500: errors,
+    404: errors,
+    403: errors,
+    401: errors,
+}
+
+bible_app.error_handler = handler
+# bible_app.error_handler = errors.handler
 
 project_root = dirname(__file__)
 
