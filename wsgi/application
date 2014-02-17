@@ -30,7 +30,7 @@ import re
 
 import sword_search
 from sword_search import build_highlight_regx, highlight_search_terms
-# import errors
+import errors
 
 
 # Global variables
@@ -800,7 +800,6 @@ def index(location='biblesearch'):
 
     """
 
-    return sword_search.INDEX_PATH
     if location == 'biblesearch':
         if request.get_cookie('javascript'):
             print('javascript: yep')
@@ -808,8 +807,5 @@ def index(location='biblesearch'):
         else:
             print('javascript: nope')
             return build_page()
-
-    if error_is:
-        return error_is
 
     return template(location)
