@@ -29,6 +29,7 @@ import json
 import re
 import sys
 
+sys.path.insert(0, join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi/'))
 import sword_search
 from sword_search import build_highlight_regx, highlight_search_terms
 
@@ -794,10 +795,8 @@ def index(location='biblesearch'):
 
     """
 
-    return '<br/>'.join(dir(sword_search))
     try:
-        # bible_search = sword_search.Search(multiword=True)
-        bible_search = sword_search.Test()
+        bible_search = sword_search.Search(multiword=True)
     except Exception as err:
         return "Error: {0}".format(err)
 
