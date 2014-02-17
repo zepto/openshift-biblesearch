@@ -794,11 +794,10 @@ def index(location='biblesearch'):
 
     """
 
-    return dir(sword_search)
-    # try:
-    #     bible_search = sword_search.Search(multiword=True)
-    # except Exception as err:
-    #     return "Error: {0}".format(err)
+    try:
+        bible_search = sword_search.Search(multiword=True)
+    except Exception as err:
+        return "Error: {0}".format(err)
 
     if location == 'biblesearch':
         if request.get_cookie('javascript'):
