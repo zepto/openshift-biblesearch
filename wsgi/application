@@ -126,10 +126,10 @@ project_root = dirname(__file__)
 
 error_is = None
 
-try:
-    bible_search = sword_search.Search(multiword=True)
-except Exception as err:
-    error_is = "{0}".format(err)
+# try:
+#     bible_search = sword_search.Search(multiword=True)
+# except Exception as err:
+#     error_is = "{0}".format(err)
 
 
 def tag_func(match):
@@ -809,6 +809,7 @@ def index(location='biblesearch'):
 
     if error_is:
         return error_is
+
     return template(location)
 
 
