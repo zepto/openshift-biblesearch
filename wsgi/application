@@ -794,6 +794,7 @@ def index(location='biblesearch'):
 
     """
 
+    return '<br/>'.join(dir(sword_search))
     try:
         # bible_search = sword_search.Search(multiword=True)
         bible_search = sword_search.Test()

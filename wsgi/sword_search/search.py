@@ -1388,6 +1388,7 @@ class Test(object):
     def __init__(self):
         pass
 
+
 class Search(object):
     """ Provides a simple way of searching an IndexDict for verses.
 
