@@ -124,7 +124,11 @@ bible_app.error_handler = handler
 
 project_root = dirname(__file__)
 
-# bible_search = sword_search.Search(multiword=True)
+try:
+    bible_search = sword_search.Search(multiword=True)
+    error_is = None
+except Exception as err:
+    error_is = "{0}".format(err)
 
 
 def tag_func(match):
@@ -802,6 +806,8 @@ def index(location='biblesearch'):
             print('javascript: nope')
             return build_page()
 
+    if error_is:
+        return error_is
     return template(location)
 
 
