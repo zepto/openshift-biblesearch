@@ -29,8 +29,6 @@ import json
 import re
 import sys
 
-sys.path.insert(0, join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi/'))
-
 import sword_search
 from sword_search import build_highlight_regx, highlight_search_terms
 # import errors
@@ -804,6 +802,7 @@ def index(location='biblesearch'):
     """
 
     try:
+        sys.path.insert(0, join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi/'))
         import errors
     except Exception as err:
         return "Error: {0}".format(err)
