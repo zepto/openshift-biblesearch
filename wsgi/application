@@ -124,9 +124,10 @@ bible_app.error_handler = handler
 
 project_root = dirname(__file__)
 
+error_is = None
+
 try:
     bible_search = sword_search.Search(multiword=True)
-    error_is = None
 except Exception as err:
     error_is = "{0}".format(err)
 
