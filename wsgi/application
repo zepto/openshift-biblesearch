@@ -31,7 +31,6 @@ import sys
 
 import sword_search
 from sword_search import build_highlight_regx, highlight_search_terms
-# import errors
 
 
 # Global variables
@@ -126,11 +125,6 @@ bible_app = Bottle()
 project_root = dirname(__file__)
 
 error_is = None
-
-# try:
-#     bible_search = sword_search.Search(multiword=True)
-# except Exception as err:
-#     error_is = "{0}".format(err)
 
 
 def tag_func(match):
@@ -806,6 +800,11 @@ def index(location='biblesearch'):
     #     bible_app.error_handler = errors.handler
     # except Exception as err:
     #     return "Error: {0}".format(err)
+
+    try:
+        bible_search = sword_search.Search(multiword=True)
+    except Exception as err:
+        return "Error: {0}".format(err)
 
     if location == 'biblesearch':
         if request.get_cookie('javascript'):
