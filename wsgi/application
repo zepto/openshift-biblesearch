@@ -19,7 +19,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from os.path import join, dirname
-# import bottle
 from bottle import run, debug, jinja2_template as template, TEMPLATE_PATH
 from bottle import redirect, error
 from bottle import request, response, redirect, static_file, Bottle
@@ -124,6 +123,8 @@ handler = {
 bible_app.error_handler = handler
 
 project_root = dirname(__file__)
+
+bible_search = sword_search.Search(multiword=True)
 
 
 def tag_func(match):
@@ -340,6 +341,11 @@ def lookup_verses(verse_refs, search_terms: str='', context=0):
     for ref, verse_text in sword_search.VerseTextIter(iter(verse_list),
                                                       strongs=True, morph=True,
                                                       render='raw'):
+
+        # Setup the verse text for highlighting and put the headings,
+        # notes, and paragraph markers in.
+        verse_text = tag_regx.sub(tag_func, verse_text)
+
         # Highlight only in the verses found during the search, not in
         # any of the context verses.
         if ref in verse_refs:
@@ -347,15 +353,11 @@ def lookup_verses(verse_refs, search_terms: str='', context=0):
             # the search query in the output text.
             reel = build_highlight_regx(terms_list, False,
                                         color_tag='</?span[^>]*>',
-                                        extra_tag='</span>')
+                                        extra_tag='</span>') #,
             # Apply the highlight regex to highlight the verse text.
             verse_text = highlight_search_terms(verse_text, reel,
                                                 highlight_text,
                                                 color_tag='</?span[^>]*>')
-
-        # Setup the verse text for highlighting and put the headings,
-        # notes, and paragraph markers in.
-        verse_text = tag_regx.sub(tag_func, verse_text)
 
         if results_list:
             last_ref = results_list[-1]['verseref']
@@ -398,7 +400,6 @@ def do_search(search_terms: str='', min_range: str="Genesis",
     terms_list = [''.join(i) for i in search_regx.findall(search_terms)]
 
     # Get a set of verse references that match the search criteria.
-    bible_search = sword_search.Search(multiword=True)
     verse_set = bible_search.mixed_search(terms_list, range_str=range_str)
 
     # Build the return list of dictionaries.
@@ -508,7 +509,6 @@ def handle_static(path):
     """
 
     # Return the requested static file.
-    # return static_file(path, join(project_root, "assets"))
     return static_file(path, join(os.environ['OPENSHIFT_REPO_DIR'], "wsgi/assets/"))
 
 
@@ -728,9 +728,9 @@ def strongs(ext: str=''):
 
         # Fix strongs headings so their language can be detected by
         # the javascript.
-        text_name = 'data-name="%s\\1"' % lang.upper()
+        text_name = 'data-name="%s%s\\1"' % (lang.upper(), '0' if lang == 'H' else '')
         try:
-            text = re.sub('name="([^"]+)"', text_name, text)
+            text = re.sub('name="0*([^"]+)"', text_name, text)
         except Exception as err:
             print("%s: (text: %s, text_name: %s, num: %s)" % (err, text, text_name, num))
 

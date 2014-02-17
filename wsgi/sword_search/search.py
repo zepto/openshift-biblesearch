@@ -675,7 +675,6 @@ from .utils import *
 
 
 try:
-    import bla
     from .sword_verses import *
 except ImportError:
     Sword = None
@@ -994,7 +993,7 @@ def highlight_search_terms(verse_text, regx_list, highlight_text,
 
         match_text = match.group()
         for word in match.groups():
-            if word:
+            if word and word != match_text:
                 info_print(word, tag=20)
                 try:
                     match_text = re.sub('''
@@ -2231,7 +2230,7 @@ class Search(object):
             # Get the range key.
             if not range_str:
                 range_str = 'Genesis-Revelation'
-            range_k = Sword.VerseKey().ParseVerseList(range_str, 'Genesis 1:1',
+            range_k = Sword.VerseKey().parseVerseList(range_str, 'Genesis 1:1',
                                                       True)
 
             flags = re.I if not case_sensitive else 0
@@ -3147,7 +3146,7 @@ class SearchCmd(Cmd):
                         value = '; '.join(str(i) for i in value)
                     else:
                         key = Sword.VerseKey()
-                        range_list = key.ParseVerseList(value, 'Genesis 1:1',
+                        range_list = key.parseVerseList(value, 'Genesis 1:1',
                                                         True, False)
                         value = range_list.getRangeText()
                 print('{1:{0}} = {2}'.format(max_len, setting, value))
