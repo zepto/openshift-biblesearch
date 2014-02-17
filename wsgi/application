@@ -124,7 +124,7 @@ bible_app = Bottle()
 
 project_root = dirname(__file__)
 
-error_is = None
+bible_search = sword_search.Search(multiword=True)
 
 
 def tag_func(match):
@@ -794,10 +794,10 @@ def index(location='biblesearch'):
 
     """
 
-    try:
-        bible_search = sword_search.Search(multiword=True)
-    except Exception as err:
-        return "Error: {0}".format(err)
+    # try:
+    #     bible_search = sword_search.Search(multiword=True)
+    # except Exception as err:
+    #     return "Error: {0}".format(err)
 
     if location == 'biblesearch':
         if request.get_cookie('javascript'):
