@@ -124,7 +124,7 @@ bible_app.error_handler = handler
 
 project_root = dirname(__file__)
 
-bible_search = sword_search.Search(multiword=True)
+# bible_search = sword_search.Search(multiword=True)
 
 
 def tag_func(match):
