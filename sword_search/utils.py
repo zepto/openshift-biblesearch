@@ -38,7 +38,7 @@ VERBOSE_LEVEL = 1
 
 # Setup the index path to '/userhome/.biblesearch', and if that doesn't exist
 # use the current working directory.
-INDEX_PATH = os.path.join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi/')
+INDEX_PATH = os.path.join(os.getenv('HOME'), '.biblesearch')
 if not os.path.isdir(INDEX_PATH):
     INDEX_PATH = os.getcwd()
 
